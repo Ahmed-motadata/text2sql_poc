@@ -1,0 +1,114 @@
+[
+    {
+      "schema": "apolo",
+      "db_name": "request",
+      "db_description": "This database is designed to store and manage all IT Service Management (ITSM) related data, including service requests, change management records, problem tracking logs, user profiles, asset details, and workflow histories. It serves as the core backend for maintaining the lifecycle of IT operations and support activities."
+    },
+    {
+      "table_name": "request",
+      "tb_description": "Central table that tracks IT service requests throughout their lifecycle. Contains comprehensive metadata including creation and update timestamps, assignment details, priority levels, and status transitions. Links to multiple reference tables like status, priority, and category to facilitate ticket classification, routing, and resolution. User relationships are maintained through requesterid and technicianid fields that reference flotouser table. SLA compliance is tracked through dueby field and status transitions.",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "bigint",
+          "description": "Primary key that uniquely identifies each service request record. Used as reference target for task.refid when task.refmodel refers to requests. Follows system-wide numbering sequence for consistent tracking across the platform."
+        },
+        {
+          "column_name": "updatedbyid",
+          "data_type": "bigint",
+          "description": "Foreign key referencing flotouser.id to identify who last modified the request. Essential for audit trail and accountability tracking. Updates automatically with each record modification."
+        },
+        {
+          "column_name": "updatedtime",
+          "data_type": "bigint",
+          "description": "Timestamp recording when the request was last modified. Used for SLA calculations, aging reports, and audit trails. Automatically updated with each record change."
+        },
+        {
+          "column_name": "createdtime",
+          "data_type": "bigint",
+          "description": "Timestamp marking when the request was initially created. Critical for SLA calculation starting point and age-based metrics. Used extensively in time-based reports and performance analytics."
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying",
+          "description": "Unique identifier or reference code for the request that follows configured naming patterns. Often used in external communications and reporting. May contain auto-generated prefixes based on request category or department for easy identification."
+        },
+        {
+          "column_name": "oobtype",
+          "data_type": "integer",
+          "description": "Out-of-Box type classification that determines the request's core behavior and available workflow actions. Predefined values control form layouts, available statuses, and automation rules. Essential for distinguishing between incident, service request, and other request categories."
+        },
+        {
+          "column_name": "removed",
+          "data_type": "boolean",
+          "description": "Logical deletion flag that marks a request as removed without physically deleting the record. When set to true, the request is hidden from standard views but retained for audit purposes. Supports data retention policies while maintaining referential integrity."
+        },
+        {
+          "column_name": "approvalstatus",
+          "data_type": "integer",
+          "description": "Current state of the approval process for this request. Tracks multiple approval stages including pending, approved, rejected, and canceled states. Used by approval workflows to determine routing and notification rules. Critical for governance and authorization tracking."
+        },
+        {
+          "column_name": "priorityid",
+          "data_type": "bigint",
+          "description": "Foreign key reference to priority.id that determines the operational importance and response targets for this request. Influences SLA calculation, queue position, and escalation rules. May be automatically calculated based on impact and urgency values or manually assigned."
+        },
+        {
+          "column_name": "requesterid",
+          "data_type": "bigint",
+          "description": "Foreign key reference to flotouser.id identifying the user who submitted or is the beneficiary of this request. Used for communication, satisfaction surveys, and access control. Essential for request ownership and departmental reporting hierarchy."
+        },
+        {
+          "column_name": "description",
+          "data_type": "text",
+          "description": "Comprehensive text explaining the request details, including user-reported information and troubleshooting notes. May contain formatted text, embedded images, or attachment references. Searchable for knowledge base correlation and similar case identification."
+        },
+        {
+          "column_name": "statusid",
+          "data_type": "bigint",
+          "description": "Foreign key reference to status.id indicating the current position in the request lifecycle. Controls available actions, SLA calculation, and visibility in queues. Status transitions trigger workflow events, notifications, and time tracking metrics."
+        },
+        {
+          "column_name": "technicianid",
+          "data_type": "bigint",
+          "description": "Foreign key reference to flotouser.id identifying the support staff currently responsible for handling this request. Assignment changes are tracked for workload management and accountability. Critical for resource allocation, skills matching, and performance metrics."
+        },
+        {
+          "column_name": "dueby",
+          "data_type": "bigint",
+          "description": "Target resolution deadline timestamp calculated based on SLA definitions tied to request priority, category, and other attributes. Used for compliance tracking, escalation triggers, and performance reporting. May be automatically adjusted based on business hours, holidays, and status changes."
+        },
+        {
+          "column_name": "urgencyid",
+          "data_type": "bigint",
+          "description": "Foreign key reference indicating the time sensitivity of the request from the requester's perspective. Often combined with impact to automatically determine priority. Reflects how quickly a resolution is needed regardless of organizational impact."
+        },
+        {
+          "column_name": "sourceid",
+          "data_type": "bigint",
+          "description": "Foreign key reference identifying the channel through which the request was submitted (web portal, email, phone, chat, etc.). Influences routing rules, template selection, and channel-specific processing. Used for channel effectiveness and adoption reporting."
+        },
+        {
+          "column_name": "spam",
+          "data_type": "boolean",
+          "description": "Flag indicating whether the request has been identified as spam or unwanted communication. When enabled, the request may be filtered from standard queues and reports. Used primarily for email-originated requests that pass through spam detection systems."
+        },
+        {
+          "column_name": "viprequest",
+          "data_type": "boolean",
+          "description": "Indicator that this request requires priority handling due to the requester's organizational importance. VIP requests may bypass standard queuing rules, have custom SLA targets, and trigger special notifications. Often associated with executive management or critical business roles."
+        },
+        {
+          "column_name": "subject",
+          "data_type": "character varying",
+          "description": "Brief summary headline that describes the request's purpose or issue. Displayed in list views, notifications, and reports as the primary identifier. Should be concise while providing enough context to understand the request's nature without viewing details."
+        },
+        {
+          "column_name": "categoryid",
+          "data_type": "bigint",
+          "description": "Foreign key reference to category.id that classifies the request for routing, reporting, and knowledge association. Enables organization by technology, service, or issue type. Often presented in a hierarchical structure and may influence SLA targets and available resolution options."
+        }
+      ]
+    }
+  ]
+  
