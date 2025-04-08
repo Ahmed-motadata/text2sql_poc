@@ -2,3 +2,7 @@ langchain
 langchain_core
 langchain_community
 openai
+dotenv
+langchain_openai
+langchain_groq
+langchain_google_genai
