@@ -175,7 +175,7 @@
               "description": "Foreign key reference to department.id that associates the user with their organizational unit. Influences request routing, approval hierarchies, and service catalog visibility. Used for organizational reporting and access control scoping."
             }
           ]
-        }
+        } ,
 
         {
             "table_name": "status",
@@ -267,7 +267,7 @@
                 "description": "Internal technical identifier used in business rules, workflows, and integrations. Unlike the display name, this remains consistent even if the user-facing label changes. Critical for maintaining automation rule stability and API compatibility."
               }
             ]
-          }
+          },
           {
             "table_name": "priority",
             "tb_description": "Standardized priority classification reference table used across multiple entity types including requests, problems, changes, and tasks. Determines service level targets and operational response times when linked through priorityid foreign keys. Supports custom priority matrices with visual indicators via colourcode. Hierarchical priority structures can be defined through parentid self-referencing. Priority values influence resource allocation, escalation paths, and reporting metrics throughout the ITSM platform.",
@@ -348,7 +348,7 @@
                 "description": "Internal technical identifier used in business rules, SLA definitions, and integrations. Provides stability for automation even if display names change. Critical for maintaining rule consistency and API compatibility across system updates."
               }
             ]
-          }
+          },
           {
             "table_name": "impact",
             "tb_description": "Reference table that quantifies the organizational effect of incidents, problems, and changes. Used in priority calculation matrices and risk assessments. Impact values are referenced by multiple operational tables through impactid foreign keys. Color-coded visual indicators are supported through the colourcode field. Hierarchical impact structures can be defined through parentid relationships. Impact classifications influence escalation paths, notification rules, and management reporting across the ITSM platform. There are 4 types of impact: Low, On Users, On Business, On Department.",
@@ -429,7 +429,7 @@
                 "description": "Internal technical identifier used in priority calculation matrices, business rules, and integrations. Provides stability for automation even if display names change. Critical for maintaining calculation consistency across system updates."
               }
             ]
-          }
+          },
           {
             "table_name": "department",
             "description": "Organizational unit reference table used to define the structure of the enterprise. Each department represents a functional group (e.g., HR, IT, Finance) and is used for routing, assignment, reporting, and access control. Hierarchical relationships allow modeling of multi-level organizations. Used throughout ITSM for approvals, escalations, and user role scoping.",
@@ -495,7 +495,7 @@
                 "description": "Self-referencing foreign key to department.id that establishes hierarchical organizational structure. Enables multi-level department trees reflecting organizational reporting lines. Essential for roll-up reporting and inherited access controls."
               }
             ]
-          }
+          },
           {
             "table_name": "location",
             "schema": "apolo",
@@ -572,7 +572,7 @@
                 "description": "Geographic coordinate specifying east-west position of the location. Used with latitude for mapping, proximity analysis, and spatial reporting. Supports geographic visualization and location-aware service delivery."
               }
             ]
-          }
+          },
           {
             "table_name": "product",
             "description": "Asset catalog table that documents technology products supported by the IT organization. Provides standardized product definitions for service catalog, asset management, and procurement processes. Linked to specific manufacturers through manufacturerid reference. Products are categorized via producttypeid for filtering and reporting. Serves as reference data for incident classification, problem analysis, and change impact assessment. Product records include identification information like part numbers to support inventory and license management.",
@@ -643,7 +643,7 @@
                 "description": "Foreign key reference that categorizes the product within the organizational taxonomy. Controls lifecycle workflows, depreciation rules, and management processes. Distinguishes between hardware, software, consumables, and services."
               }
             ]
-          }
+          },
           {
             "table_name": "change",
             "tb_description": "Change management tracking table that documents planned modifications to IT services and infrastructure. Implements formal change control processes with approval workflows, risk assessment, and implementation planning. Links to reference tables via statusid, priorityid, categoryid, and risktypeid for comprehensive change classification. Assignment relationships are maintained through technicianid (implementer) and changemanager (oversight) references to flotouser. Change records can be associated with requests, problems, and releases through relationship tables. Scheduling and timeline tracking is facilitated through startdate and enddate fields.",
@@ -734,7 +734,7 @@
                 "description": "Planned implementation completion timestamp that defines the expected conclusion of change activities. Used for resource allocation, service disruption communications, and SLA suspension periods. Helps measure implementation efficiency."
               }
             ]
-          }
+          },
           {
             "table_name": "release",
             "tb_description": "Release management table that coordinates the deployment of multiple changes as unified packages. Ensures controlled delivery of software updates and infrastructure modifications to production environments. Classification is provided through references to status, priority, category, and risk tables. Key stakeholders are identified via technicianid, requesterid, and releasemanager references to flotouser. Release planning and execution are managed through startdate and enddate scheduling. Release packages typically contain multiple change records and associated tasks for implementation steps. Supports major, minor, and emergency release classification through releasetypeid.",
@@ -825,7 +825,7 @@
                 "description": "Planned deployment completion timestamp marking the expected conclusion of release activities and return to normal operation. Used for scheduling post-implementation reviews and hypercare support periods. Defines the release window boundary."
               }
             ]
-          }
+          },
         
         {
             "table_name": "release",
@@ -917,7 +917,7 @@
                       "description": "Foreign key reference categorizing the nature of the task (investigation, implementation, documentation, approval, etc.). Determines required skills, completion verification rules, and workflow behavior. Supports specialized routing and reporting."
                     }
                   ]
-                }
+                },
         
                 {
                     "table_name": "category",
@@ -989,7 +989,7 @@
                         "description": "Text code incorporated into the automatic naming or numbering patterns for records assigned to this category. Creates category-specific identification patterns (e.g., \"HW-\" for hardware). Supports intuitive reference code generation."
                       }
                     ]
-                  }
+                  },
 
                   {
                     "table_name": "company",
@@ -1036,7 +1036,7 @@
                         "description": "Flag controlling whether this company's access to the system is currently active. When enabled, prevents all users from this company from logging in. Used for temporary service suspension without data deletion. Supports billing disputes or contract lapses."
                       }
                     ]
-                  }
+                  },
                 
                   {
                     "table_name": "vendor",
@@ -1123,7 +1123,7 @@
                         "description": "Postal code component of the vendor's primary business address. Used for accurate mail delivery and geographical classification. Format varies by country according to local postal standards."
                       }
                     ]
-                  }
+                  },
 
                   {
                     "table_name": "problem",
@@ -1210,7 +1210,7 @@
                         "description": "Foreign key reference identifying which organizational service capability is affected by this problem. Links to service catalog and business capability mapping. Essential for business impact assessment and stakeholder communication during problem resolution."
                       }
                     ]
-                  }
+                  },
                 
                   {
                     "table_name": "project",
@@ -1313,7 +1313,7 @@
                             "table_name": "project"
                         }
                     ]
-                }   
+                },   
                 
                 {
                     "table_name": "reportcolumn",
@@ -1375,7 +1375,7 @@
                             "description": "Boolean flag controlling whether this column displays a count of all values (including duplicates) in summary rows. When enabled, shows record frequency metrics. Useful for volume analysis and workload distribution reporting."
                         }
                     ]
-                }
+                },
                 
                 {
                     "table_name": "reportdefinition",
@@ -1447,7 +1447,7 @@
                             "description": "Specific chart or graph format to be used when includechart is enabled (bar, line, pie, etc.). Determines the visual representation style best suited to the data patterns. Should be selected based on the analytical purpose and data characteristics."
                         }
                     ]
-                }
+                },
             
                 {
                     "table_name": "patch",
@@ -1539,7 +1539,7 @@
                             "description": "Human-readable name or summary headline for the patch as provided by the vendor. Often more descriptive than the technical name field. Used in communications, bulletins, and user-facing notifications about upcoming patch deployments."
                         }
                     ]
-                }
+                },
                 {
                     "table_name": "flotorole",
                     "tb_description": "Security framework table that defines access control profiles assignable to users. Implements role-based access control (RBAC) throughout the platform. Each role encapsulates specific permissions that determine functional capabilities and data visibility. System-defined roles are identified through systemname and isdefault flags. Role assignments determine menu visibility, allowed actions, and recordset filtering across the application. Multiple roles can be assigned to users to create granular permission matrices that align with organizational security policies.",
