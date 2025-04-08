@@ -1,114 +1,164 @@
-import psycopg2
-from psycopg2 import pool
-import logging
 import os
+import psycopg2
 from dotenv import load_dotenv
+import logging
 
-# Load environment variables from .env file
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Load environment variables
 load_dotenv()
 
-class PostgresConnection:
+def establish_connection(dbname=None, user=None, password=None, host=None, port=None):
     """
-    A class for managing connections to PostgreSQL database
+    Establish a connection to the PostgreSQL database.
+    
+    Args:
+        dbname: Database name (defaults to DB_NAME from env)
+        user: Database user (defaults to DB_USER from env)
+        password: Database password (defaults to DB_PASSWORD from env)
+        host: Database host (defaults to DB_HOST from env or 'localhost')
+        port: Database port (defaults to DB_PORT from env or '5432')
+    
+    Returns:
+        tuple: (connection, cursor) if successful, (None, None) on failure
     """
+    # Use environment variables if parameters are not provided
+    dbname = dbname or os.environ.get('DB_NAME')
+    user = user or os.environ.get('DB_USER')
+    password = password or os.environ.get('DB_PASSWORD')
+    host = host or os.environ.get('DB_HOST', 'localhost')
+    port = port or os.environ.get('DB_PORT', '5432')
     
-    def __init__(self, dbname=None, user=None, password=None, host=None, port=None):
-        """Initialize the database connection parameters"""
-        # Use environment variables if parameters are not provided
-        self.dbname = dbname or os.environ.get('DB_NAME')
-        self.user = user or os.environ.get('DB_USER')
-        self.password = password or os.environ.get('DB_PASSWORD')
-        self.host = host or os.environ.get('DB_HOST', 'localhost')
-        self.port = port or os.environ.get('DB_PORT', '5432')
-        self.connection = None
-        self.cursor = None
-        self.connection_pool = None
-    
-    @classmethod
-    def from_env(cls):
-        """Create a connection instance using environment variables"""
-        return cls()
+    try:
+        # Attempt to connect to the specified database
+        connection = psycopg2.connect(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+        cursor = connection.cursor()
         
-    def connect(self):
-        """Establish a connection to the PostgreSQL database"""
-        try:
-            self.connection = psycopg2.connect(
-                dbname=self.dbname,
-                user=self.user,
-                password=self.password,
-                host=self.host,
-                port=self.port
-            )
-            self.cursor = self.connection.cursor()
-            logging.info("Connected to PostgreSQL database successfully")
-            return True
-        except (Exception, psycopg2.Error) as error:
-            logging.error(f"Error connecting to PostgreSQL database: {error}")
-            return False
-            
-    def create_connection_pool(self, min_conn=1, max_conn=10):
-        """Create a connection pool for better performance in multi-threaded apps"""
-        try:
-            self.connection_pool = pool.ThreadedConnectionPool(
-                min_conn,
-                max_conn,
-                dbname=self.dbname,
-                user=self.user,
-                password=self.password,
-                host=self.host,
-                port=self.port
-            )
-            logging.info("PostgreSQL connection pool created successfully")
-            return True
-        except (Exception, psycopg2.Error) as error:
-            logging.error(f"Error creating connection pool: {error}")
-            return False
-    
-    def execute_query(self, query, params=None):
-        """Execute a query and return the results"""
-        try:
-            if not self.connection or self.connection.closed:
-                self.connect()
-                
-            self.cursor.execute(query, params)
-            
-            if query.strip().upper().startswith(("SELECT", "SHOW", "DESCRIBE")):
-                return self.cursor.fetchall()
-            else:
-                self.connection.commit()
-                return True
-                
-        except (Exception, psycopg2.Error) as error:
-            logging.error(f"Error executing query: {error}")
-            self.connection.rollback()
-            return False
-            
-    def get_table_schema(self, table_name):
-        """Get the schema of a specific table"""
-        query = """
-        SELECT column_name, data_type 
-        FROM information_schema.columns
-        WHERE table_name = %s
-        """
-        return self.execute_query(query, (table_name,))
-    
-    def get_all_tables(self):
-        """Get a list of all tables in the database"""
-        query = """
-        SELECT table_name 
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-        """
-        return self.execute_query(query)
+        # Print verification message
+        print(f"✅ Successfully connected to PostgreSQL database '{dbname}' at {host}:{port}")
+        logging.info(f"Connected to PostgreSQL database: {dbname}")
         
-    def close(self):
-        """Close the database connection"""
-        if self.cursor:
-            self.cursor.close()
-        if self.connection:
-            self.connection.close()
-            logging.info("PostgreSQL connection closed")
+        return connection, cursor
+    
+    except psycopg2.OperationalError as error:
+        # If the database doesn't exist, provide helpful guidance
+        if "database" in str(error) and "does not exist" in str(error):
+            print(f"❌ Database '{dbname}' does not exist.")
+            print(f"\nTo create the database, connect to PostgreSQL and run:")
+            print(f"    CREATE DATABASE {dbname};\n")
+        else:
+            print(f"❌ Failed to connect to the database: {error}")
+        
+        logging.error(f"Error connecting to PostgreSQL database: {error}")
+        return None, None
+    
+    except Exception as error:
+        print(f"❌ Failed to connect to the database: {error}")
+        logging.error(f"Error connecting to PostgreSQL database: {error}")
+        return None, None
+
+def close_connection(connection, cursor):
+    """
+    Close the database connection and cursor.
+    
+    Args:
+        connection: The database connection to close
+        cursor: The cursor to close
+    """
+    if cursor:
+        cursor.close()
+    if connection:
+        connection.close()
+        print("Database connection closed")
+        logging.info("PostgreSQL connection closed")
+
+def keep_connection_alive(connection, cursor, interval=30):
+    """
+    Keep the database connection alive by running a simple query at regular intervals.
+    This function runs in the background and doesn't produce any output.
+    
+    Args:
+        connection: The database connection to keep alive
+        cursor: The cursor for the connection
+        interval: Number of seconds between keep-alive queries (default: 30)
+    
+    Returns:
+        A callable that when called will stop the keep-alive process
+    """
+    import threading
+    import time
+    
+    stop_event = threading.Event()
+    
+    def _keep_alive_worker():
+        while not stop_event.is_set():
+            try:
+                # Run a minimal query to keep the connection active
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
+            except:
+                # Silently handle any errors
+                pass
             
-    def __del__(self):
-        """Destructor to ensure connection is closed"""
-        self.close()
+            # Sleep for the specified interval
+            time.sleep(interval)
+    
+    # Start the keep-alive thread
+    keep_alive_thread = threading.Thread(target=_keep_alive_worker, daemon=True)
+    keep_alive_thread.start()
+    
+    # Return a function to stop the keep-alive process
+    def stop_keep_alive():
+        stop_event.set()
+        if keep_alive_thread.is_alive():
+            keep_alive_thread.join(timeout=1.0)
+    
+    return stop_keep_alive
+
+# Example usage
+if __name__ == "__main__":
+    connection, cursor = establish_connection()
+    
+    if connection:
+        try:
+            # Test a simple query
+            cursor.execute("SELECT version();")
+            version = cursor.fetchone()
+            print(f"PostgreSQL version: {version[0]}")
+            
+            # Start keep-alive and wait indefinitely
+            print("\nKeeping connection open - press Ctrl+C to exit")
+            
+            # Start the keep-alive process
+            stop_keep_alive = keep_connection_alive(connection, cursor)
+            
+            # Keep the main thread running
+            import signal
+            import time
+            
+            # Define signal handler for graceful exit
+            def signal_handler(sig, frame):
+                print("\nExiting and closing database connection...")
+                stop_keep_alive()
+                close_connection(connection, cursor)
+                exit(0)
+            
+            # Register signal handler for Ctrl+C
+            signal.signal(signal.SIGINT, signal_handler)
+            
+            # Keep the main thread alive
+            while True:
+                time.sleep(60)  # Just sleep and let the keep-alive thread do its work
+                
+        except Exception as e:
+            print(f"Error: {e}")
+            close_connection(connection, cursor)
+    else:
+        print("Failed to establish database connection.")
