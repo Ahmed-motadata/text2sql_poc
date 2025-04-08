@@ -5,6 +5,8 @@ This module provides centralized settings for:
 - Default LLM model for general use
 - Query generation LLM model
 - Embedding models for vectorization
+- Vector store configuration
+- Default prompts
 """
 
 import os
@@ -34,6 +36,16 @@ from base.embed_models import (
     jina_embed_base,
     jina_embed_clip,
     jina_embed_small
+)
+
+# Import prompts
+from base.prompts import (
+    SQL_GENERATION_PROMPT,
+    SQL_GENERATION_WITH_EXAMPLES_PROMPT,
+    SQL_EXPLANATION_PROMPT,
+    SQL_DEBUGGING_PROMPT,
+    SQL_OPTIMIZATION_PROMPT,
+    ALL_PROMPTS
 )
 
 # Define model enumerations for type checking and autocompletion
@@ -67,6 +79,27 @@ DEFAULT_QUERY_LLM = chat_gemini_flash
 
 # Default embedding model (used for vectorizing text)
 DEFAULT_EMBEDDING_MODEL = jina_embed_base
+
+# Default prompt for SQL generation
+DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
+
+# =========== VECTOR STORE SETTINGS ===========
+
+# Default Qdrant vector store settings
+VECTOR_STORE_SETTINGS = {
+    "host": os.getenv("QDRANT_HOST", "localhost"),
+    "port": int(os.getenv("QDRANT_PORT", 6333)),
+    "grpc_port": int(os.getenv("QDRANT_GRPC_PORT", 6334)) if os.getenv("QDRANT_GRPC_PORT") else None,
+    "api_key": os.getenv("QDRANT_API_KEY"),
+    "https": os.getenv("QDRANT_HTTPS", "False").lower() == "true",
+    "prefer_grpc": os.getenv("QDRANT_PREFER_GRPC", "False").lower() == "true",
+    "timeout": float(os.getenv("QDRANT_TIMEOUT", 10.0))
+}
+
+# Default collection settings for schema metadata
+DEFAULT_COLLECTION_NAME = "text2sql_schema"
+DEFAULT_VECTOR_SIZE = 768  # Default for jina-embeddings-v2-base-en
+DEFAULT_DISTANCE = "cosine"
 
 # =========== MODEL MAPPINGS ===========
 
@@ -152,3 +185,43 @@ def get_embedding_model(model_name: Optional[str] = None):
     except (ValueError, KeyError):
         print(f"Warning: Embedding model '{model_name}' not found. Using default embedding model.")
         return DEFAULT_EMBEDDING_MODEL
+
+def get_prompt(prompt_type: str = "generation"):
+    """
+    Get a prompt template by type.
+    
+    Args:
+        prompt_type: Type of prompt to retrieve (matches keys in ALL_PROMPTS)
+        
+    Returns:
+        The corresponding prompt template or default prompt if not found
+    """
+    if prompt_type in ALL_PROMPTS:
+        return ALL_PROMPTS[prompt_type]
+    print(f"Warning: Prompt type '{prompt_type}' not found. Using default SQL generation prompt.")
+    return DEFAULT_SQL_PROMPT
+
+def get_vector_store_config():
+    """
+    Get the vector store configuration parameters.
+    
+    Returns:
+        Dictionary with vector store connection settings
+    """
+    return VECTOR_STORE_SETTINGS
+
+def get_collection_config(collection_name=None):
+    """
+    Get collection configuration for vector store.
+    
+    Args:
+        collection_name: Optional name of collection to use (defaults to DEFAULT_COLLECTION_NAME)
+        
+    Returns:
+        Dictionary with collection configuration parameters
+    """
+    return {
+        "name": collection_name or DEFAULT_COLLECTION_NAME,
+        "vector_size": DEFAULT_VECTOR_SIZE,
+        "distance": DEFAULT_DISTANCE
+    }
