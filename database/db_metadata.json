@@ -1,114 +1,1591 @@
 [
     {
-      "schema": "apolo",
-      "db_name": "request",
-      "db_description": "This database is designed to store and manage all IT Service Management (ITSM) related data, including service requests, change management records, problem tracking logs, user profiles, asset details, and workflow histories. It serves as the core backend for maintaining the lifecycle of IT operations and support activities."
-    },
-    {
-      "table_name": "request",
-      "tb_description": "Central table that tracks IT service requests throughout their lifecycle. Contains comprehensive metadata including creation and update timestamps, assignment details, priority levels, and status transitions. Links to multiple reference tables like status, priority, and category to facilitate ticket classification, routing, and resolution. User relationships are maintained through requesterid and technicianid fields that reference flotouser table. SLA compliance is tracked through dueby field and status transitions.",
-      "columns": [
-        {
-          "column_name": "id",
-          "data_type": "bigint",
-          "description": "Primary key that uniquely identifies each service request record. Used as reference target for task.refid when task.refmodel refers to requests. Follows system-wide numbering sequence for consistent tracking across the platform."
-        },
-        {
-          "column_name": "updatedbyid",
-          "data_type": "bigint",
-          "description": "Foreign key referencing flotouser.id to identify who last modified the request. Essential for audit trail and accountability tracking. Updates automatically with each record modification."
-        },
-        {
-          "column_name": "updatedtime",
-          "data_type": "bigint",
-          "description": "Timestamp recording when the request was last modified. Used for SLA calculations, aging reports, and audit trails. Automatically updated with each record change."
-        },
-        {
-          "column_name": "createdtime",
-          "data_type": "bigint",
-          "description": "Timestamp marking when the request was initially created. Critical for SLA calculation starting point and age-based metrics. Used extensively in time-based reports and performance analytics."
-        },
-        {
-          "column_name": "name",
-          "data_type": "character varying",
-          "description": "Unique identifier or reference code for the request that follows configured naming patterns. Often used in external communications and reporting. May contain auto-generated prefixes based on request category or department for easy identification."
-        },
-        {
-          "column_name": "oobtype",
-          "data_type": "integer",
-          "description": "Out-of-Box type classification that determines the request's core behavior and available workflow actions. Predefined values control form layouts, available statuses, and automation rules. Essential for distinguishing between incident, service request, and other request categories."
-        },
-        {
-          "column_name": "removed",
-          "data_type": "boolean",
-          "description": "Logical deletion flag that marks a request as removed without physically deleting the record. When set to true, the request is hidden from standard views but retained for audit purposes. Supports data retention policies while maintaining referential integrity."
-        },
-        {
-          "column_name": "approvalstatus",
-          "data_type": "integer",
-          "description": "Current state of the approval process for this request. Tracks multiple approval stages including pending, approved, rejected, and canceled states. Used by approval workflows to determine routing and notification rules. Critical for governance and authorization tracking."
-        },
-        {
-          "column_name": "priorityid",
-          "data_type": "bigint",
-          "description": "Foreign key reference to priority.id that determines the operational importance and response targets for this request. Influences SLA calculation, queue position, and escalation rules. May be automatically calculated based on impact and urgency values or manually assigned."
-        },
-        {
-          "column_name": "requesterid",
-          "data_type": "bigint",
-          "description": "Foreign key reference to flotouser.id identifying the user who submitted or is the beneficiary of this request. Used for communication, satisfaction surveys, and access control. Essential for request ownership and departmental reporting hierarchy."
-        },
-        {
-          "column_name": "description",
-          "data_type": "text",
-          "description": "Comprehensive text explaining the request details, including user-reported information and troubleshooting notes. May contain formatted text, embedded images, or attachment references. Searchable for knowledge base correlation and similar case identification."
-        },
-        {
-          "column_name": "statusid",
-          "data_type": "bigint",
-          "description": "Foreign key reference to status.id indicating the current position in the request lifecycle. Controls available actions, SLA calculation, and visibility in queues. Status transitions trigger workflow events, notifications, and time tracking metrics."
-        },
-        {
-          "column_name": "technicianid",
-          "data_type": "bigint",
-          "description": "Foreign key reference to flotouser.id identifying the support staff currently responsible for handling this request. Assignment changes are tracked for workload management and accountability. Critical for resource allocation, skills matching, and performance metrics."
-        },
-        {
-          "column_name": "dueby",
-          "data_type": "bigint",
-          "description": "Target resolution deadline timestamp calculated based on SLA definitions tied to request priority, category, and other attributes. Used for compliance tracking, escalation triggers, and performance reporting. May be automatically adjusted based on business hours, holidays, and status changes."
-        },
-        {
-          "column_name": "urgencyid",
-          "data_type": "bigint",
-          "description": "Foreign key reference indicating the time sensitivity of the request from the requester's perspective. Often combined with impact to automatically determine priority. Reflects how quickly a resolution is needed regardless of organizational impact."
-        },
-        {
-          "column_name": "sourceid",
-          "data_type": "bigint",
-          "description": "Foreign key reference identifying the channel through which the request was submitted (web portal, email, phone, chat, etc.). Influences routing rules, template selection, and channel-specific processing. Used for channel effectiveness and adoption reporting."
-        },
-        {
-          "column_name": "spam",
-          "data_type": "boolean",
-          "description": "Flag indicating whether the request has been identified as spam or unwanted communication. When enabled, the request may be filtered from standard queues and reports. Used primarily for email-originated requests that pass through spam detection systems."
-        },
-        {
-          "column_name": "viprequest",
-          "data_type": "boolean",
-          "description": "Indicator that this request requires priority handling due to the requester's organizational importance. VIP requests may bypass standard queuing rules, have custom SLA targets, and trigger special notifications. Often associated with executive management or critical business roles."
-        },
-        {
-          "column_name": "subject",
-          "data_type": "character varying",
-          "description": "Brief summary headline that describes the request's purpose or issue. Displayed in list views, notifications, and reports as the primary identifier. Should be concise while providing enough context to understand the request's nature without viewing details."
-        },
-        {
-          "column_name": "categoryid",
-          "data_type": "bigint",
-          "description": "Foreign key reference to category.id that classifies the request for routing, reporting, and knowledge association. Enables organization by technology, service, or issue type. Often presented in a hierarchical structure and may influence SLA targets and available resolution options."
-        }
-      ]
+        "schema": "apolo",
+        "db_name": "request",
+        "db_description": "This database is designed to store and manage all IT Service Management (ITSM) related data, including service requests, change management records, problem tracking logs, user profiles, asset details, and workflow histories. It serves as the core backend for maintaining the lifecycle of IT operations and support activities.",
+        "tables": [
+            {
+                "table_name": "request",
+                "tb_description": "Central table that tracks IT service requests throughout their lifecycle. Contains comprehensive metadata including creation and update timestamps, assignment details, priority levels, and status transitions. Links to multiple reference tables like status, priority, and category to facilitate ticket classification, routing, and resolution. User relationships are maintained through requesterid and technicianid fields that reference flotouser table. SLA compliance is tracked through dueby field and status transitions.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key that uniquely identifies each service request record. Used as reference target for task.refid when task.refmodel refers to requests. Follows system-wide numbering sequence for consistent tracking across the platform."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id to identify who last modified the request. Essential for audit trail and accountability tracking. Updates automatically with each record modification."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the request was last modified. Used for SLA calculations, aging reports, and audit trails. Automatically updated with each record change."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the request was initially created. Critical for SLA calculation starting point and age-based metrics. Used extensively in time-based reports and performance analytics."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique identifier or reference code for the request that follows configured naming patterns. Often used in external communications and reporting. May contain auto-generated prefixes based on request category or department for easy identification."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box type classification that determines the request's core behavior and available workflow actions. Predefined values control form layouts, available statuses, and automation rules. Essential for distinguishing between incident, service request, and other request categories."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that marks a request as removed without physically deleting the record. When set to true, the request is hidden from standard views but retained for audit purposes. Supports data retention policies while maintaining referential integrity."
+                    },
+                    {
+                        "column_name": "approvalstatus",
+                        "data_type": "integer",
+                        "description": "Current state of the approval process for this request. Tracks multiple approval stages including pending, approved, rejected, and canceled states. Used by approval workflows to determine routing and notification rules. Critical for governance and authorization tracking."
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id that determines the operational importance and response targets for this request. Influences SLA calculation, queue position, and escalation rules. May be automatically calculated based on impact and urgency values or manually assigned."
+                    },
+                    {
+                        "column_name": "requesterid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the user who submitted or is the beneficiary of this request. Used for communication, satisfaction surveys, and access control. Essential for request ownership and departmental reporting hierarchy."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive text explaining the request details, including user-reported information and troubleshooting notes. May contain formatted text, embedded images, or attachment references. Searchable for knowledge base correlation and similar case identification."
+                    },
+                    {
+                        "column_name": "statusid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to status.id indicating the current position in the request lifecycle. Controls available actions, SLA calculation, and visibility in queues. Status transitions trigger workflow events, notifications, and time tracking metrics."
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the support staff currently responsible for handling this request. Assignment changes are tracked for workload management and accountability. Critical for resource allocation, skills matching, and performance metrics."
+                    },
+                    {
+                        "column_name": "dueby",
+                        "data_type": "bigint",
+                        "description": "Target resolution deadline timestamp calculated based on SLA definitions tied to request priority, category, and other attributes. Used for compliance tracking, escalation triggers, and performance reporting. May be automatically adjusted based on business hours, holidays, and status changes."
+                    },
+                    {
+                        "column_name": "urgencyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference indicating the time sensitivity of the request from the requester's perspective. Often combined with impact to automatically determine priority. Reflects how quickly a resolution is needed regardless of organizational impact."
+                    },
+                    {
+                        "column_name": "sourceid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference identifying the channel through which the request was submitted (web portal, email, phone, chat, etc.). Influences routing rules, template selection, and channel-specific processing. Used for channel effectiveness and adoption reporting."
+                    },
+                    {
+                        "column_name": "spam",
+                        "data_type": "boolean",
+                        "description": "Flag indicating whether the request has been identified as spam or unwanted communication. When enabled, the request may be filtered from standard queues and reports. Used primarily for email-originated requests that pass through spam detection systems."
+                    },
+                    {
+                        "column_name": "viprequest",
+                        "data_type": "boolean",
+                        "description": "Indicator that this request requires priority handling due to the requester's organizational importance. VIP requests may bypass standard queuing rules, have custom SLA targets, and trigger special notifications. Often associated with executive management or critical business roles."
+                    },
+                    {
+                        "column_name": "subject",
+                        "data_type": "character varying",
+                        "description": "Brief summary headline that describes the request's purpose or issue. Displayed in list views, notifications, and reports as the primary identifier. Should be concise while providing enough context to understand the request's nature without viewing details."
+                    },
+                    {
+                        "column_name": "categoryid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to category.id that classifies the request for routing, reporting, and knowledge association. Enables organization by technology, service, or issue type. Often presented in a hierarchical structure and may influence SLA targets and available resolution options."
+                    }
+                ]
+            },
+            {
+                "table_name": "flotouser",
+                "tb_description": "Core user repository that stores all system user profiles. Maintains hierarchical relationships through managerid field and organizational context via departmentid and locationid references. Controls system access through authentication parameters and access level settings. User records connect to multiple operational tables including requests, changes, problems, and tasks through various foreign key relationships. Contains essential contact information and preferences that support notification workflows and reporting.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each user record. Referenced by multiple tables including request.requesterid, request.technicianid, and task.technicianid to establish user relationships throughout the system."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to flotouser.id that identifies which administrator last modified this user record. Important for security audit trails and compliance reporting."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the user record was last modified. Used for account maintenance auditing and security compliance reporting. Automatically updated on record changes."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to flotouser.id that identifies which administrator initially created this user account. Critical for account provisioning audit trails."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the user account was initially created. Used for account lifecycle management, periodic review cycles, and security compliance reporting."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Full display name of the user, typically in \"First Last\" format. Used throughout the interface for identification in assignment fields, request lists, and audit trails. The primary human-readable identifier for the user account."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that determines the user record's behavior template and default permissions. Distinguishes between standard users, technicians, administrators, and system accounts. Influences available actions and default role assignments."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion marker that indicates the user account has been decommissioned without physically removing the database record. Preserves historical associations while preventing login and new assignments. Supports compliance with data retention policies."
+                    },
+                    {
+                        "column_name": "accesslevel",
+                        "data_type": "integer",
+                        "description": "Security classification determining base system access privileges independent of role assignments. Hierarchical levels control administrative capabilities, configuration access, and global permissions. Works in conjunction with role-based permissions for defense-in-depth security."
+                    },
+                    {
+                        "column_name": "authprovider",
+                        "data_type": "character varying",
+                        "description": "Authentication mechanism used for this user account (local, LDAP, SAML, OAuth, etc.). Determines password policies, login workflows, and integration points. Critical for single sign-on functionality and security protocol compliance."
+                    },
+                    {
+                        "column_name": "contactno",
+                        "data_type": "character varying",
+                        "description": "Primary telephone number for contacting the user. Used for SMS notifications, callback coordination, and emergency contact. May include extension information and be formatted according to regional standards."
+                    },
+                    {
+                        "column_name": "departmentid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to department.id that associates the user with their organizational unit. Influences request routing, approval hierarchies, and service catalog visibility. Used for organizational reporting and access control scoping."
+                    }
+                ]
+            },
+            {
+                "table_name": "status",
+                "tb_description": "Reference table defining all possible status values across the ITSM platform. Supports workflow state management for requests, problems, changes, releases, and tasks through the statusid foreign key relationship. Hierarchical status structures are enabled through parentid self-referencing. Visual indicators are configured via colourcode attribute, while SLA calculation behaviors are controlled by slaoff flag. Statuses are grouped into logical stages represented by the statusstage field, enabling comprehensive workflow visualization and process control.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each status definition. Referenced by multiple entity tables including request.statusid, change.statusid, and problem.statusid to indicate current state in respective workflows."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id to track which administrator last modified this status definition. Important for configuration change management and audit trails."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the status definition was last modified. Used for configuration management history and audit compliance. Automatically updated with each record change."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id to identify which administrator originally created this status definition. Provides traceability for configuration management."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the status definition was initially created. Used for configuration management history and lifecycle tracking of system definitions."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Human-readable label displayed in the interface for this status. Used in dropdown menus, request details, and reports. Should clearly communicate the request's current state to both technicians and requesters."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that defines the status's standard behavior and position in predefined workflows. Determines compatibility with system templates and automation rules. Distinguishes between custom and system-provided status values."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion marker that hides this status from active selection while preserving historical references. Prevents new records from using this status without breaking reporting on historical data. Supports configuration cleanup and simplification."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of the status meaning, intended usage, and business implications. Used for admin reference and user training. Should include guidelines for when this status is appropriate and what actions should follow."
+                    },
+                    {
+                        "column_name": "isdefault",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this status is automatically assigned to new records when no explicit status is specified. Only one status per entity type can be marked as default. Essential for ensuring new records always have a valid workflow position."
+                    },
+                    {
+                        "column_name": "model",
+                        "data_type": "integer",
+                        "description": "Entity type or module for which this status is applicable (request, problem, change, etc.). Controls where the status appears in selection lists. Enables sharing the status table across multiple entity types while maintaining appropriate context separation."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence of statuses in lists and dropdowns. Lower values appear first. Allows logical workflow organization (open states before closed states) regardless of creation date or alphabetical order."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to status.id that establishes hierarchical relationships between statuses. Enables status grouping and inheritance of properties. Supports complex workflow modeling with parent/child relationships for detailed tracking."
+                    },
+                    {
+                        "column_name": "colourcode",
+                        "data_type": "character varying",
+                        "description": "Hexadecimal color value used for visual identification of this status in the user interface. Applied to status indicators, badges, and kanban boards. Helps users quickly identify record states through consistent color coding."
+                    },
+                    {
+                        "column_name": "slaoff",
+                        "data_type": "boolean",
+                        "description": "Flag controlling whether SLA timers continue counting when a record is in this status. When enabled, SLA calculation is paused (such as when waiting for customer input). Critical for accurate service level measurement and compliance reporting."
+                    },
+                    {
+                        "column_name": "statusstage",
+                        "data_type": "integer",
+                        "description": "Broader workflow phase grouping multiple granular statuses (such as \"In Progress\" containing \"Assigned\", \"Working\", etc.). Used for simplified reporting, kanban views, and high-level workflow visualization. Provides macro-level process visibility."
+                    },
+                    {
+                        "column_name": "systemname",
+                        "data_type": "character varying",
+                        "description": "Internal technical identifier used in business rules, workflows, and integrations. Unlike the display name, this remains consistent even if the user-facing label changes. Critical for maintaining automation rule stability and API compatibility."
+                    }
+                ]
+            },
+            {
+                "table_name": "priority",
+                "tb_description": "Standardized priority classification reference table used across multiple entity types including requests, problems, changes, and tasks. Determines service level targets and operational response times when linked through priorityid foreign keys. Supports custom priority matrices with visual indicators via colourcode. Hierarchical priority structures can be defined through parentid self-referencing. Priority values influence resource allocation, escalation paths, and reporting metrics throughout the ITSM platform.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Unique identifier for the priority."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "ID of the user who last updated the priority."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp when the priority was last updated."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "ID of the user who created the priority."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp when the priority was created."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "User-facing label that identifies this priority level in the interface. Typically uses terms like \"Critical\", \"High\", \"Medium\", or \"Low\". Appears in dropdown selectors, request details, and reports to communicate urgency to all stakeholders."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that identifies standard priority levels versus custom organizational extensions. System-provided priorities have special handling for upgrades and patches. Helps distinguish between core priorities and organizational customizations."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that hides this priority from active selection while preserving it for historical records. Allows priority scheme simplification without breaking existing records or reports. Supports configuration evolution over time."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of when this priority should be assigned, including examples and impact criteria. Used for training, governance, and consistent application. Should clarify the business scenarios appropriate for this priority level."
+                    },
+                    {
+                        "column_name": "isdefault",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this priority is automatically assigned when no explicit value is provided. Only one priority per entity type can be marked as default. Ensures new records always have valid priority assignment for proper SLA calculation."
+                    },
+                    {
+                        "column_name": "model",
+                        "data_type": "integer",
+                        "description": "Entity type or module for which this priority is applicable (request, problem, change, etc.). Controls where the priority appears in selection lists. Enables sharing the priority table across multiple entity types with appropriate context separation."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence in lists and dropdowns, and may also influence operational importance. Lower values typically represent higher priorities. Creates consistent ordering across all interfaces regardless of creation date or name."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to priority.id that establishes hierarchical relationships between priority levels. Supports complex priority matrices with parent/child relationships. Enables priority inheritance and grouping for specialized workflows."
+                    },
+                    {
+                        "column_name": "colourcode",
+                        "data_type": "character varying",
+                        "description": "Hexadecimal color value used for visual identification of this priority in the interface. Applied to priority indicators, status boards, and reports. Creates intuitive visual urgency signals (red for critical, yellow for medium, etc.)."
+                    },
+                    {
+                        "column_name": "systemname",
+                        "data_type": "character varying",
+                        "description": "Internal technical identifier used in business rules, SLA definitions, and integrations. Provides stability for automation even if display names change. Critical for maintaining rule consistency and API compatibility across system updates."
+                    }
+                ]
+            },
+            {
+                "table_name": "impact",
+                "tb_description": "Reference table that quantifies the organizational effect of incidents, problems, and changes. Used in priority calculation matrices and risk assessments. Impact values are referenced by multiple operational tables through impactid foreign keys. Color-coded visual indicators are supported through the colourcode field. Hierarchical impact structures can be defined through parentid relationships. Impact classifications influence escalation paths, notification rules, and management reporting across the ITSM platform. There are 4 types of impact: Low, On Users, On Business, On Department.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each impact level definition. Referenced by problem.impactid and used in matrix calculations for priority determination. Fundamental to incident classification and response prioritization."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this impact definition. Important for governance of impact scheme changes that affect incident classification and priority matrices."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the impact definition was last modified. Used for tracking configuration changes that might affect priority calculations. Essential for audit trails and change management documentation."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator originally created this impact definition. Provides accountability for impact framework establishment and configuration governance."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the impact definition was initially created. Used for impact scheme lifecycle tracking and configuration history. Helps establish timeline of impact definition evolution."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "User-facing label that identifies this impact level in the interface. There are 4 types of impact: Low, On Users, On Business, On Department. Communicates the organizational scope affected by an incident or problem."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that distinguishes between standard impact levels and custom organizational extensions. System-provided impacts receive special handling during upgrades. Helps identify core configurations versus organizational customizations."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that hides this impact level from active selection while preserving it for historical records. Allows impact scheme refinement without breaking existing records or reports. Supports configuration evolution over time."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of this impact level's scope, affected user count thresholds, and business implications. Used for consistent application and training. Should provide clear criteria for determining when this impact level applies to a situation."
+                    },
+                    {
+                        "column_name": "isdefault",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this impact level is automatically assigned when no explicit value is provided. Only one impact per entity type can be default. Ensures new records always have valid impact assignment for proper priority calculation and reporting."
+                    },
+                    {
+                        "column_name": "model",
+                        "data_type": "integer",
+                        "description": "Entity type or module for which this impact level is applicable (incident, problem, change, etc.). Controls where the impact appears in selection lists. Enables sharing the impact table across multiple entity types with appropriate context separation."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence and severity ranking in priority matrices. Lower values typically represent higher impacts. Creates consistent ordering across interfaces and establishes clear hierarchy for automation rules."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to impact.id that establishes hierarchical relationships between impact levels. Supports complex impact models with parent/child relationships. Enables impact inheritance and grouping for specialized assessment workflows."
+                    },
+                    {
+                        "column_name": "colourcode",
+                        "data_type": "character varying",
+                        "description": "Hexadecimal color value used for visual identification of this impact level in the interface. Applied to impact indicators, matrices, and reports. Creates intuitive visual signals (red for enterprise-wide, yellow for departmental, etc.)."
+                    },
+                    {
+                        "column_name": "systemname",
+                        "data_type": "character varying",
+                        "description": "Internal technical identifier used in priority calculation matrices, business rules, and integrations. Provides stability for automation even if display names change. Critical for maintaining calculation consistency across system updates."
+                    }
+                ]
+            },
+            {
+                "table_name": "department",
+                "description": "Organizational unit reference table used to define the structure of the enterprise. Each department represents a functional group (e.g., HR, IT, Finance) and is used for routing, assignment, reporting, and access control. Hierarchical relationships allow modeling of multi-level organizations. Used throughout ITSM for approvals, escalations, and user role scoping.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each department entry. Serves as reference in user records, assignment groups, ticket ownership, and reporting hierarchy."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this department record. Important for organizational structure change auditing and compliance documentation."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the department record was last modified. Used for tracking organizational changes and structure evolution. Automatically updated with each record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator initially created this department. Critical for organizational governance and change management audit trails."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the department was initially created in the system. Used for organizational history tracking and structural evolution mapping."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Official name of the department used for display throughout the interface. Appears in user profiles, assignment filters, and reports. Should align with formal organizational nomenclature for consistency."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that identifies predefined versus custom department types. System-provided departments receive special handling during upgrades. Distinguishes between core organizational units and customer-specific extensions."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that hides this department from active selection while preserving historical references. Prevents reassignment to this department while maintaining data integrity for historical records. Supports organizational restructuring."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of the department's function, responsibilities, and scope within the organization. Used for clarification in assignment interfaces and documentation. Helps users understand department purpose and service boundaries."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence of departments in selection lists and organization charts. Lower values appear first. Creates consistent ordering across all interfaces regardless of creation date or alphabetical sorting."
+                    },
+                    {
+                        "column_name": "departmenthead",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies the manager or leader of this department. Used in approval workflows, escalation paths, and organizational reporting. Critical for establishing management responsibility and authority."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to department.id that establishes hierarchical organizational structure. Enables multi-level department trees reflecting organizational reporting lines. Essential for roll-up reporting and inherited access controls."
+                    }
+                ]
+            },
+            {
+                "table_name": "location",
+                "schema": "apolo",
+                "description": "Geographic and physical site management table that maintains spatial organization of company assets and personnel. Referenced by flotouser.locationid to establish user site associations and by project.locationid for site-specific implementations. Hierarchical location structures are supported through self-referencing parentid relationship. GPS coordinates enable mapping integrations and geospatial analytics. The barcodeprefix field supports inventory and asset management workflows for location-specific item identification.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each physical or geographic location. Referenced by flotouser.locationid and project.locationid to establish spatial context. Fundamental to location-based reporting and asset tracking."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this location record. Important for tracking changes to site information and geospatial data. Part of the location management audit trail."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the location information was last modified. Used for tracking facility changes and site evolution. Automatically updated with each record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator initially created this location. Essential for site management governance and expansion tracking."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the location was initially defined in the system. Used for tracking organizational geographical expansion and site acquisition timelines."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Official name of the physical site or geographic location. Appears in user profiles, assignment filters, and location-based reports. Should use standardized naming conventions for consistency across the organization."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that differentiates between standard location types and custom site categories. Determines location behavior in templates and workflows. Helps distinguish between headquarters, branch offices, data centers, and other site types."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that marks a location as decommissioned while preserving historical references. Prevents new assignments to this location while maintaining data integrity for historical records. Supports facility lifecycle management."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed information about the location including address, contact details, operating hours, and special access instructions. Provides context for on-site support and service delivery. May include facility management contact information."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence of locations in selection lists and geography hierarchies. Lower values appear first. Allows custom ordering separate from alphabetical sorting or creation date."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to location.id that establishes hierarchical geographic structures. Enables organization of locations by country, region, campus, building, and floor relationships. Essential for geographical roll-up reporting."
+                    },
+                    {
+                        "column_name": "barcodeprefix",
+                        "data_type": "character varying",
+                        "description": "Location-specific identifier prefix used in asset tagging and inventory management. Creates unique identification patterns for items based on their physical location. Essential for asset tracking and automated inventory processes."
+                    },
+                    {
+                        "column_name": "latitude",
+                        "data_type": "character varying",
+                        "description": "Geographic coordinate specifying north-south position of the location. Used with longitude for mapping, distance calculations, and geospatial analytics. Enables integration with mapping services and location-based workflows."
+                    },
+                    {
+                        "column_name": "longitude",
+                        "data_type": "character varying",
+                        "description": "Geographic coordinate specifying east-west position of the location. Used with latitude for mapping, proximity analysis, and spatial reporting. Supports geographic visualization and location-aware service delivery."
+                    }
+                ]
+            },
+            {
+                "table_name": "product",
+                "description": "Asset catalog table that documents technology products supported by the IT organization. Provides standardized product definitions for service catalog, asset management, and procurement processes. Linked to specific manufacturers through manufacturerid reference. Products are categorized via producttypeid for filtering and reporting. Serves as reference data for incident classification, problem analysis, and change impact assessment. Product records include identification information like part numbers to support inventory and license management.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each product definition. Referenced by assets, purchases, and licenses throughout the system. Fundamental to configuration management and service catalog functionality."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this product record. Important for product catalog governance and version control. Part of the configuration management audit trail."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the product information was last updated. Used for tracking product definition evolution and catalog currency. Automatically updated with each record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator initially created this product record. Critical for product catalog management and procurement governance."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the product was initially added to the catalog. Used for tracking product lifecycle and support timeline commencement. Important for warranty and support entitlement."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Internal system name of the product used for database operations and integrations. May differ from the user-facing display name. Should follow consistent naming conventions for system processing."
+                    },
+                    {
+                        "column_name": "oobtype",
+                        "data_type": "integer",
+                        "description": "Out-of-Box classification that identifies standard product types versus custom catalog entries. Determines product behavior in templates and workflows. Helps distinguish between hardware, software, services, and bundle product types."
+                    },
+                    {
+                        "column_name": "removed",
+                        "data_type": "boolean",
+                        "description": "Logical deletion flag that marks a product as discontinued while preserving references in existing assets and historical data. Prevents new procurement of this product while maintaining data integrity for deployed instances."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive product information including capabilities, specifications, and support details. Displayed in service catalog and asset information screens. Provides technical context for support staff and request fulfillment teams."
+                    },
+                    {
+                        "column_name": "displayname",
+                        "data_type": "character varying",
+                        "description": "User-friendly product name shown in interfaces, reports, and service catalog. May include branding elements and marketing terminology. Often more descriptive than the internal system name for better user recognition."
+                    },
+                    {
+                        "column_name": "manufacturerid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to the vendor.id of the product manufacturer. Establishes brand relationship and support channel information. Essential for warranty claims, patch management, and vendor-specific workflows."
+                    },
+                    {
+                        "column_name": "partnumber",
+                        "data_type": "character varying",
+                        "description": "Manufacturer's unique identifier for the product or SKU. Used for procurement, warranty lookups, and vendor communications. Critical for ensuring correct product specification during ordering and fulfillment."
+                    },
+                    {
+                        "column_name": "producttypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference that categorizes the product within the organizational taxonomy. Controls lifecycle workflows, depreciation rules, and management processes. Distinguishes between hardware, software, consumables, and services."
+                    }
+                ]
+            },
+            {
+                "table_name": "change",
+                "tb_description": "Change management tracking table that documents planned modifications to IT services and infrastructure. Implements formal change control processes with approval workflows, risk assessment, and implementation planning. Links to reference tables via statusid, priorityid, categoryid, and risktypeid for comprehensive change classification. Assignment relationships are maintained through technicianid (implementer) and changemanager (oversight) references to flotouser. Change records can be associated with requests, problems, and releases through relationship tables. Scheduling and timeline tracking is facilitated through startdate and enddate fields.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each change record. Referenced by tasks, approvals, and implementation plans. Forms the central identifier for all change management processes and documentation."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified this change record. Critical for change governance and audit requirements. Helps establish accountability for change documentation currency."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the change record was last modified. Used for change activity tracking and communication timeliness. Automatically updated with each record modification and workflow state transition."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially submitted this change request. Important for determining change origination and initial requirements ownership."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the change was initially requested. Used for measuring change lead time and planning effectiveness. Starts the clock for change management process metrics and SLA measurement."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique reference code or identifier displayed in communications, reports, and tracking systems. Often follows a specific numbering pattern like \"CHG-10001\". The primary human-readable identifier for the change."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive documentation of the change purpose, scope, implementation details, and rollback procedures. Core component of change documentation used by implementers and approvers. Should include technical specifications and business justification."
+                    },
+                    {
+                        "column_name": "statusid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to status.id indicating the current position in the change lifecycle. Controls available actions, approval gates, and visibility in change calendars. Change Advisory Board (CAB) reviews often trigger status transitions."
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id determining the change's operational importance and scheduling precedence. Influences review urgency, resource allocation, and implementation scheduling. Reflects business impact of delay versus risk."
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the primary implementer responsible for executing the change. Accountable for technical feasibility and execution quality. Distinct from the change manager who provides oversight."
+                    },
+                    {
+                        "column_name": "requesterid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying who requested or sponsored the change. Responsible for business justification and benefits realization. Often consulted for requirements clarification and acceptance testing."
+                    },
+                    {
+                        "column_name": "categoryid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to category.id that classifies the change by technology, service, or component affected. Determines routing to specialized review boards and required approval workflows. Supports change filtering and trend analysis."
+                    },
+                    {
+                        "column_name": "changemanager",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the designated change coordinator who oversees the process. Responsible for documentation completeness, stakeholder communication, and procedure adherence. Ensures proper governance throughout the change lifecycle."
+                    },
+                    {
+                        "column_name": "risktypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference that indicates the assessed risk level of implementing this change. Influences approval requirements, testing scope, and scheduling restrictions. Higher risk changes typically require more comprehensive review and planning."
+                    },
+                    {
+                        "column_name": "changetypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference categorizing the nature of the change (standard, normal, emergency, etc.). Determines the process workflow, approval requirements, and documentation levels. Standard changes may follow expedited paths with reduced governance."
+                    },
+                    {
+                        "column_name": "startdate",
+                        "data_type": "bigint",
+                        "description": "Planned implementation commencement timestamp that appears in change calendars and resource schedules. Used for conflict detection with other changes and maintenance windows. Critical for change collision prevention and communication."
+                    },
+                    {
+                        "column_name": "enddate",
+                        "data_type": "bigint",
+                        "description": "Planned implementation completion timestamp that defines the expected conclusion of change activities. Used for resource allocation, service disruption communications, and SLA suspension periods. Helps measure implementation efficiency."
+                    }
+                ]
+            },
+            {
+                "table_name": "release",
+                "tb_description": "Release management table that coordinates the deployment of multiple changes as unified packages. Ensures controlled delivery of software updates and infrastructure modifications to production environments. Classification is provided through references to status, priority, category, and risk tables. Key stakeholders are identified via technicianid, requesterid, and releasemanager references to flotouser. Release planning and execution are managed through startdate and enddate scheduling. Release packages typically contain multiple change records and associated tasks for implementation steps. Supports major, minor, and emergency release classification through releasetypeid.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each release package record. Serves as the central reference for all components, changes, and tasks associated with this coordinated deployment. Core identifier for release management processes."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified this release record. Important for release governance and audit requirements. Tracks ongoing refinement of release documentation and planning."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the release information was last modified. Used for tracking release planning evolution and documentation currency. Updated automatically with each record modification and status change."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially defined this release package. Important for establishing release ownership and accountability at inception. Typically a release or product manager."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the release was initially defined and planning commenced. Used for measuring release preparation lead time and overall release lifecycle duration. Starting point for release effectiveness metrics."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique identifier or version code that follows organizational release naming conventions (e.g., \"R22.4\" or \"Winter Release 2023\"). Used in communications, documentation, and tracking. The primary human-readable release identifier."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive documentation of the release scope, components, dependencies, and business objectives. Used by implementation teams, testers, and stakeholders. Should include both technical details and business value statements."
+                    },
+                    {
+                        "column_name": "statusid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to status.id indicating the current position in the release lifecycle. Controls available actions, approval gates, and reporting. Reflects stages like planning, building, testing, deploying, and reviewing."
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id determining the release's business importance and resource allocation precedence. Influences scheduling, conflict resolution, and escalation paths. Reflects strategic value versus tactical urgency."
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the lead technical resource responsible for implementation aspects. Ensures technical feasibility, integration, and component compatibility. Works closely with the release manager."
+                    },
+                    {
+                        "column_name": "requesterid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the business sponsor or product owner who requested this release. Accountable for requirements definition and business value realization. Typically authorizes scope changes."
+                    },
+                    {
+                        "column_name": "categoryid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to category.id that classifies the release by product line, service area, or business domain. Determines specialized review requirements and testing approaches. Supports release filtering and reporting."
+                    },
+                    {
+                        "column_name": "releasemanager",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the designated release coordinator who orchestrates the entire process. Responsible for integration, scheduling, resource management, and stakeholder communication. The primary owner of release success."
+                    },
+                    {
+                        "column_name": "risktypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference indicating the assessed risk level of this release deployment. Determines required testing depth, fallback planning, and approval thresholds. Higher risk releases typically involve more extensive controls and verification."
+                    },
+                    {
+                        "column_name": "releasetypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference categorizing the nature and scope of the release (major, minor, emergency, etc.). Controls process workflow, documentation requirements, and release cycle positioning. Major releases typically follow full lifecycle while emergency releases may be expedited."
+                    },
+                    {
+                        "column_name": "startdate",
+                        "data_type": "bigint",
+                        "description": "Planned deployment commencement timestamp appearing in release calendars and blackout schedules. Used for resource coordination, downtime notifications, and dependency management. Critical for sequencing multiple release components."
+                    },
+                    {
+                        "column_name": "enddate",
+                        "data_type": "bigint",
+                        "description": "Planned deployment completion timestamp marking the expected conclusion of release activities and return to normal operation. Used for scheduling post-implementation reviews and hypercare support periods. Defines the release window boundary."
+                    }
+                ]
+            },
+            {
+                "table_name": "release",
+                "tb_description": "Work unit management table that tracks individual activities required for service delivery. Tasks can be associated with multiple parent records (requests, problems, changes, projects) through refid and refmodel references, creating a flexible work breakdown structure. Assignment and scheduling are managed through technicianid, starttime, and endtime fields. Task progress is tracked via statusid reference, while importance is indicated through priorityid. Time management is supported by estimatedtime field for resource planning and performance analysis. Task classification is provided through tasktypeid for filtering and reporting across different operational contexts.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each discrete work unit. Referenced in work logs, time entries, and status updates. Forms the basis for work breakdown structures and project management tracking."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified the task details or status. Used for tracking task evolution and progress reporting. Documents who made the most recent changes to task parameters."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the task information or status was last modified. Used for measuring task progress velocity and identifying stalled work. Automatically updated with each record modification or status change."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially defined or assigned this task. Important for tracking task origination and work delegation patterns. May be different from the parent record creator."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the task was initially created and entered the work queue. Used for measuring assignment response times and overall task duration. Starting point for task throughput and aging metrics."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique identifier or task reference code that follows organizational task naming conventions. Often incorporates parent record identifier plus sequence number. The primary reference code used in communications and reports."
+                    },
+                    {
+                        "column_name": "subject",
+                        "data_type": "character varying",
+                        "description": "Concise summary of the task purpose that appears in task lists, dashboards, and notifications. Should clearly communicate what needs to be done without requiring the viewer to open detailed description. Limited to one line for efficient display."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed instructions, requirements, and context necessary for task completion. Includes technical details, acceptance criteria, and reference information. Should provide everything the assignee needs to accomplish the task effectively."
+                    },
+                    {
+                        "column_name": "refid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to the parent record (request, problem, change, etc.) that this task supports. Creates the association between a task and its parent work item. Must be used with refmodel to establish proper relationship."
+                    },
+                    {
+                        "column_name": "refmodel",
+                        "data_type": "integer",
+                        "description": "Identifier specifying the parent record's entity type (request, problem, change, etc.). Determines which table contains the record referenced by refid. Essential for polymorphic relationships allowing tasks to be associated with multiple entity types."
+                    },
+                    {
+                        "column_name": "starttime",
+                        "data_type": "bigint",
+                        "description": "Planned or actual commencement timestamp for the task work. Used for resource scheduling, task sequencing, and dependency management. May represent the actual start when work began or the planned start for future tasks."
+                    },
+                    {
+                        "column_name": "endtime",
+                        "data_type": "bigint",
+                        "description": "Planned or actual completion timestamp for the task work. Used for measuring task duration, deadline compliance, and resource allocation. May be updated as work progresses and estimates are refined."
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying who is assigned responsibility for completing this task. Determines task ownership, workload allocation, and accountability. Critical for resource management and performance metrics."
+                    },
+                    {
+                        "column_name": "statusid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to status.id indicating the current stage in the task lifecycle. Controls visibility in work queues and progress reporting. Transitions through states like pending, in progress, complete, or canceled."
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id determining the task's operational importance and work queue position. Influences technician work order and resource contention resolution. May inherit from parent record or be independently established."
+                    },
+                    {
+                        "column_name": "estimatedtime",
+                        "data_type": "bigint",
+                        "description": "Projected effort required to complete the task, typically in minutes or hours. Used for resource capacity planning, workload balancing, and efficiency metrics. Critical for project scheduling and milestone planning."
+                    },
+                    {
+                        "column_name": "tasktypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference categorizing the nature of the task (investigation, implementation, documentation, approval, etc.). Determines required skills, completion verification rules, and workflow behavior. Supports specialized routing and reporting."
+                    }
+                ]
+            },
+            {
+                "table_name": "category",
+                "tb_description": "Hierarchical classification table that provides taxonomic organization across multiple entity types. Serves as a foundational reference table with foreign key relationships from request.categoryid, problem.categoryid, change.categoryid and others. Supports multi-level classification trees through self-referencing parentid relationships. Categories can be specialized for different modules through the model field, allowing context-specific classification schemes. The categoryprefix field enables custom numbering schemes for associated records. Default categories are identified through isdefault flag for automated classification workflows.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each category node in the classification taxonomy. Referenced by multiple entity types for organizational categorization. Forms the backbone of the system's classification structure."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this category definition. Important for taxonomy governance and classification scheme auditing. Documents classification structure changes."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the category definition was last modified. Used for tracking taxonomy evolution and classification scheme versioning. Automatically updated with each record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator initially created this category. Critical for taxonomy development governance and structure ownership. Important for category management permissions."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the category was initially defined in the taxonomy. Used for classification scheme evolution tracking and structure growth analysis. Helps establish classification maturity timelines."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Display name of the category shown in selection trees, dropdowns, and reports. Should be concise but descriptive enough to guide proper classification. Appears in categorization interfaces and hierarchical visualizations."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of the category scope, usage guidelines, and classification criteria. Helps users select the appropriate category and maintain classification consistency. Should clarify boundaries with similar categories."
+                    },
+                    {
+                        "column_name": "parentid",
+                        "data_type": "bigint",
+                        "description": "Self-referencing foreign key to category.id that establishes the hierarchical taxonomy structure. Creates parent-child relationships between categories forming classification trees. Null indicates a top-level category. Essential for drill-down reporting."
+                    },
+                    {
+                        "column_name": "isdefault",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this category is automatically selected when no explicit category is chosen for a given entity type. Only one category per entity type per level can be default. Ensures records always have a valid classification for reporting."
+                    },
+                    {
+                        "column_name": "model",
+                        "data_type": "integer",
+                        "description": "Entity type or module for which this category is applicable (request, problem, change, etc.). Controls where the category appears in selection trees. Enables sharing the category table across multiple entity types with context-specific views."
+                    },
+                    {
+                        "column_name": "objorder",
+                        "data_type": "integer",
+                        "description": "Numeric value determining the display sequence of categories in selection lists and taxonomy trees. Lower values appear first. Allows logical ordering that may differ from alphabetical sequence for better usability."
+                    },
+                    {
+                        "column_name": "systemname",
+                        "data_type": "character varying",
+                        "description": "Internal technical identifier used in business rules, integrations, and programmatic references. Unlike the display name, this remains consistent for system stability. Critical for maintaining rule consistency across UI name changes."
+                    },
+                    {
+                        "column_name": "categoryprefix",
+                        "data_type": "character varying",
+                        "description": "Text code incorporated into the automatic naming or numbering patterns for records assigned to this category. Creates category-specific identification patterns (e.g., \"HW-\" for hardware). Supports intuitive reference code generation."
+                    }
+                ]
+            },
+            {
+                "table_name": "company",
+                "tb_description": "Multi-tenant architecture table that defines organizational boundaries for data segregation and configuration. Enables hosting multiple client organizations on a single platform instance while maintaining data isolation. Company records establish context for company-specific settings, branding, workflows, and access controls. Users and configurations can be associated with specific companies to enable managed service provider scenarios. The disable flag supports deactivating a company without deleting its data, enabling service suspension and reactivation.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each organizational entity in multi-tenant environments. Establishes top-level data segregation boundaries for client organizations. Forms the root of company-specific configuration hierarchies."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified this company record. Critical for multi-tenant governance and client configuration auditing. Documents organization-level structure changes."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the company record was last modified. Used for tracking client configuration changes in multi-tenant deployments. Automatically updated with each organization-level record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator initially created this company record. Essential for client onboarding audit trails and tenant provisioning governance in managed service environments."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the company was initially created in the system. Represents the start of the client relationship or tenant provisioning. Used for billing cycles and subscription management in multi-tenant deployments."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Official name of the organization used in interfaces, reports, and branded communications. Appears in headers, footers, and user context indicators in multi-tenant deployments. Should match client's legal or preferred business name."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Additional details about the organization including business type, relationship notes, and management contacts. Used by system administrators for client management and context. May include contract references or account management details."
+                    },
+                    {
+                        "column_name": "disable",
+                        "data_type": "boolean",
+                        "description": "Flag controlling whether this company's access to the system is currently active. When enabled, prevents all users from this company from logging in. Used for temporary service suspension without data deletion. Supports billing disputes or contract lapses."
+                    }
+                ]
+            },
+            {
+                "table_name": "vendor",
+                "tb_description": "External service provider management table that maintains relationships with suppliers and contractors. Supports vendor management processes including contract tracking, performance monitoring, and relationship management. Vendor records include comprehensive contact information for communication and escalation paths. Linked to products through manufacturer relationships and to service contracts through reference tables. Vendor information supports procurement processes, warranty management, and third-party service integration. Address fields enable geographic analysis of supplier distribution and regional support coverage.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each external service provider or supplier. Referenced by products, contracts, and purchasing records. Forms the foundation for vendor relationship management functionality."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified this vendor record. Important for supplier management governance and contact information currency. Documents vendor record maintenance responsibility."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the vendor information was last updated. Used for ensuring supplier data freshness and contact verification scheduling. Automatically updated with each vendor record modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially created this vendor record. Important for supplier onboarding governance and procurement process compliance. Documents vendor relationship origination."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the vendor was initially added to the system. Represents the beginning of the formal supplier relationship. Used for vendor tenure reporting and relationship longevity tracking."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Official business name of the vendor organization used in contracts, purchase orders, and formal communications. Appears in supplier selection interfaces and product attributions. Should match the vendor's legal business name."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed information about the vendor's services, specialties, and business relationship. Used for reference when selecting suppliers for new purchases. May include performance history, preferred status, and procurement guidelines."
+                    },
+                    {
+                        "column_name": "contactpersonname",
+                        "data_type": "character varying",
+                        "description": "Name of the primary account representative or relationship manager at the vendor. The main human point of contact for non-technical communication. Used for relationship management and contract discussions."
+                    },
+                    {
+                        "column_name": "email",
+                        "data_type": "character varying",
+                        "description": "Primary email address for vendor communications, typically for the main account representative or a shared support mailbox. Used for formal correspondence, quote requests, and order processing. Critical for documented communication flows."
+                    },
+                    {
+                        "column_name": "phone",
+                        "data_type": "character varying",
+                        "description": "Primary telephone number for contacting the vendor, either for the main account representative or central switchboard. Used for urgent communications and verbal order processing. May include extension or direct line information."
+                    },
+                    {
+                        "column_name": "city",
+                        "data_type": "character varying",
+                        "description": "City component of the vendor's primary business address. Used for geographical vendor analysis and local supplier identification. Combines with other address fields for complete location information."
+                    },
+                    {
+                        "column_name": "country",
+                        "data_type": "character varying",
+                        "description": "Country component of the vendor's primary business address. Used for international supplier management, tax compliance, and import processing. Critical for understanding jurisdictional requirements in the vendor relationship."
+                    },
+                    {
+                        "column_name": "state",
+                        "data_type": "character varying",
+                        "description": "State, province, or region component of the vendor's primary business address. Used for regional supplier analysis and tax determination. Works with other address components for complete location specification."
+                    },
+                    {
+                        "column_name": "streetline1",
+                        "data_type": "character varying",
+                        "description": "Primary street address line containing building number and street name. Used for shipping, correspondence, and contract documents. The main address component for physical mail delivery to the vendor."
+                    },
+                    {
+                        "column_name": "streetline2",
+                        "data_type": "character varying",
+                        "description": "Secondary street address information such as suite, floor, or department details. Supplements the primary address line for complete delivery instructions. Optional component for vendors with complex physical addresses."
+                    },
+                    {
+                        "column_name": "zipcode",
+                        "data_type": "character varying",
+                        "description": "Postal code component of the vendor's primary business address. Used for accurate mail delivery and geographical classification. Format varies by country according to local postal standards."
+                    }
+                ]
+            },
+            {
+                "table_name": "problem",
+                "tb_description": "Root cause investigation table that manages the identification and resolution of underlying issues causing multiple incidents. Supports problem management lifecycle from detection through investigation to resolution and knowledge capture. Classification is provided through references to status, priority, category, and impact tables. Key roles are assigned through technicianid (investigator) and requesterid (initiator) references to flotouser. Relationship to affected business services is maintained through businessserviceid. The knownerror flag identifies confirmed problems with documented workarounds that await permanent resolution, supporting interim service restoration processes.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each problem record. Referenced by knowledge base articles and linked incidents. Forms the central identifier for root cause investigation documentation and resolution tracking."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified this problem record. Important for tracking investigation progress and maintaining accountability for problem management governance."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the problem record was last modified. Used for aging analysis, activity tracking, and investigation momentum measurement. Automatically updated with each problem record change."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially created this problem record. Important for tracing problem origination and determining which role or team identified the underlying issue."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the problem was initially identified and recorded. Used as the starting point for resolution time calculation and mean-time-to-resolution (MTTR) metrics for problems."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique reference code or identifier that follows organizational problem numbering patterns (e.g., \"PRB-1001\"). Used in communications, knowledge articles, and cross-references. The primary human-readable identifier for the problem."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive documentation of the problem scope, symptoms, investigation findings, and root cause analysis. Should include technical details, error messages, and diagnostic information. Core documentation for knowledge transfer and resolution planning."
+                    },
+                    {
+                        "column_name": "statusid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to status.id indicating the current position in the problem management lifecycle. Controls investigation flow, visibility in problem dashboards, and resource allocation. Transitions through stages like identification, investigation, and resolved."
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id determining the problem's operational importance and resolution urgency. Influences resource allocation, investigation speed, and management visibility. Often calculated based on business impact and organizational risk."
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the primary investigator responsible for problem resolution. The technical specialist accountable for root cause determination and solution development. Critical for workload management and specialized assignment."
+                    },
+                    {
+                        "column_name": "requesterid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying who reported or requested the problem investigation. Often the incident manager who observed patterns across multiple incidents. May be consulted during impact assessment and resolution planning."
+                    },
+                    {
+                        "column_name": "categoryid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to category.id that classifies the problem by technology area, service component, or failure type. Enables trend analysis, knowledge categorization, and specialized routing. Supports filtering and reporting across the problem management process."
+                    },
+                    {
+                        "column_name": "knownerror",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this problem has been analyzed with root cause identified but not yet permanently resolved. When enabled, workarounds should be documented and linked. Critical for interim support processes while permanent solutions are developed."
+                    },
+                    {
+                        "column_name": "impactid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to impact.id indicating the organizational scope and severity of the problem's effect. Used in priority calculations and management reporting. Reflects the breadth of organizational disruption caused by this underlying issue."
+                    },
+                    {
+                        "column_name": "subject",
+                        "data_type": "character varying",
+                        "description": "Brief summary headline that succinctly describes the problem symptoms or error condition. Appears in problem dashboards, reports, and knowledge base search results. Should be clear and specific enough for quick identification of the issue type."
+                    },
+                    {
+                        "column_name": "businessserviceid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference identifying which organizational service capability is affected by this problem. Links to service catalog and business capability mapping. Essential for business impact assessment and stakeholder communication during problem resolution."
+                    }
+                ]
+            },
+            {
+                "table_name": "project",
+                "tb_description": "Strategic initiative management table that tracks major organizational undertakings requiring formal project management. Supports the full project lifecycle from initiation through planning, execution, and closure. Projects are classified using priorityid, projecttypeid, and risktypeid references. Resource assignment is tracked through technicianid (project manager) and related task assignments. Project scheduling is managed through startdate and enddate fields, with progress tracked via projectstatus. Location-specific implementations are identified through locationid reference. Projects can contain multiple tasks, changes, and releases as child records, enabling comprehensive work breakdown structures.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each project initiative record. Referenced by tasks, changes, and resource allocations. Central identifier for all project management activities and documentation.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified the project record. Important for project governance, audit trail, and change control. Documents accountability for project plan modifications.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the project information was last modified. Used for tracking project evolution and documentation currency. Automatically updated with each record change and status transition.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially defined this project. Usually the project sponsor or initiator. Critical for project origin tracking and governance accountability.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the project was initially created in the system. Represents the formal start of project tracking. Used for portfolio timeline analysis and organizational initiative frequency monitoring.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Unique internal reference code for the project that follows organizational project numbering patterns (e.g., \"PRJ-2023-002\"). Used in technical communications and cross-referencing. Distinct from the display name which is more descriptive.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive documentation of the project's purpose, scope, objectives, deliverables, and constraints. Core component of project definition used for stakeholder alignment and scope management. Should include business justification and success criteria.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "displayname",
+                        "data_type": "character varying",
+                        "description": "User-friendly project title used in reports, dashboards, and communications. More descriptive than the internal reference name. Should clearly convey the project's core purpose and appear in portfolio views and executive reporting.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "startdate",
+                        "data_type": "bigint",
+                        "description": "Planned or actual commencement date for project activities. Used for resource scheduling, dependency management, and portfolio timeline visualization. Critical for project sequencing and capacity planning across the organization.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "enddate",
+                        "data_type": "bigint",
+                        "description": "Targeted completion date for the project. Used for deadline planning, milestone scheduling, and portfolio management. May be adjusted as project progresses and estimates are refined. Critical for measuring on-time delivery performance.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "technicianid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to flotouser.id identifying the project manager or lead responsible for delivery. The primary accountable person for project execution and status reporting. Central point of contact for project stakeholders and governance.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "projecttypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference categorizing the nature of the project (infrastructure, application, service introduction, etc.). Determines methodology approach, governance requirements, and reporting cadence. Influences approval workflows and documentation templates.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "projectstatus",
+                        "data_type": "integer",
+                        "description": "Current state of the project in its lifecycle (planning, execution, hold, completed, etc.). Used for portfolio filtering, progress reporting, and resource allocation decisions. Critical for executive dashboards and organizational delivery metrics.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "priorityid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to priority.id indicating the project's relative importance and resource precedence. Influences conflict resolution when resources are constrained. Often determined by executive sponsors based on strategic alignment and business value.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "risktypeid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference indicating the assessed risk profile of the project. Determines oversight intensity, contingency requirements, and governance checkpoints. Higher risk projects typically require more frequent review and more detailed reporting.",
+                        "table_name": "project"
+                    },
+                    {
+                        "column_name": "locationid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to location.id identifying the primary site affected by or involved in the project. Used for regional portfolio management and site-specific resource allocation. Critical for projects involving physical infrastructure or location-specific implementations.",
+                        "table_name": "project"
+                    }
+                ]
+            },
+            {
+                "table_name": "reportcolumn",
+                "tb_description": "Report structure definition table that specifies data presentation formats for analytics and dashboards. Linked to reportdefinition records to build complete report templates. Each record defines visualization and calculation properties for a specific data field identified by propkey. Aggregation behaviors are controlled through multiple aggregation flag fields and the aggregatedfunction specification. Column organization within reports is managed through ordernumber and sectionkey grouping. The collection of reportcolumn records defines the complete structure, calculations, and layout for corresponding report definitions.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each report column definition. Multiple reportcolumn records combine to form the complete structure of a report defined in reportdefinition. Essential for report layout stability and configuration versioning."
+                    },
+                    {
+                        "column_name": "ordernumber",
+                        "data_type": "integer",
+                        "description": "Numeric sequence value determining the left-to-right position of this column in the report display. Lower values appear farther left. Critical for presenting data in a logical sequence that supports analysis and readability. Must be unique within a report."
+                    },
+                    {
+                        "column_name": "propkey",
+                        "data_type": "character varying",
+                        "description": "Field identifier or property path that specifies which data element from the source entity populates this column. May use dot notation for related fields or complex properties. The primary link between report definition and underlying data model."
+                    },
+                    {
+                        "column_name": "aggregatedfunction",
+                        "data_type": "integer",
+                        "description": "Calculation method applied to the data in this column (sum, average, count, min, max, etc.). Used for summary rows and analytical processing. Works in conjunction with group-by configurations to provide data aggregation capabilities."
+                    },
+                    {
+                        "column_name": "sectionkey",
+                        "data_type": "character varying",
+                        "description": "Grouping identifier that associates this column with a logical section in the report. Columns with the same sectionkey are treated as related for formatting and visualization purposes. Enables hierarchical organization of report content."
+                    },
+                    {
+                        "column_name": "showavg",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays an average calculation in summary rows or subtotals. When enabled, adds analytical context by showing central tendency measures. Applies only to numeric columns with meaningful averages."
+                    },
+                    {
+                        "column_name": "showmaxvalue",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays the maximum value in summary rows or subtotals. When enabled, highlights extreme values in the dataset. Particularly useful for performance metrics, SLA measurements, and resource utilization."
+                    },
+                    {
+                        "column_name": "showminvalue",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays the minimum value in summary rows or subtotals. When enabled, highlights lower boundaries in the dataset. Valuable for identifying best performance metrics or lowest utilization figures."
+                    },
+                    {
+                        "column_name": "showsum",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays a sum calculation in summary rows or subtotals. When enabled, provides cumulative totals for the column. Applicable primarily to numeric fields representing quantities, durations, or financial values."
+                    },
+                    {
+                        "column_name": "showuniqcount",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays a count of unique values in summary rows or subtotals. When enabled, shows cardinality metrics. Particularly useful for counting distinct customers, categories, or other dimensional attributes."
+                    },
+                    {
+                        "column_name": "showtotalcount",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether this column displays a count of all values (including duplicates) in summary rows. When enabled, shows record frequency metrics. Useful for volume analysis and workload distribution reporting."
+                    }
+                ]
+            },
+            {
+                "table_name": "reportdefinition",
+                "tb_description": "Analytics template configuration table that defines report specifications for business intelligence outputs. Each record establishes the core parameters for a specific report, with detailed column specifications provided by related reportcolumn records. The model field determines which entity type serves as the primary data source. Report organization is managed through folderid references for logical grouping. Display options including reportlayout and visualizationtype control the presentation format, while the top field limits result set size for performance optimization. The includechart flag enables graphical data visualization alongside tabular data.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each report configuration. Referenced by reportcolumn records to establish their parent report context. Forms the foundation for all report execution and scheduling processes."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified the report configuration. Important for report governance and change tracking. Documents accountability for report design modifications."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the report definition was last modified. Used for version control and determining report configuration freshness. Automatically updated with each configuration change or column modification."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially created this report. Important for report ownership and usage analytics. The original report designer may be consulted for clarification or modifications."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the report was initially defined in the system. Used for report inventory aging analysis and adoption tracking. Helps identify older reports that may need review or modernization."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Descriptive title of the report displayed in report catalogs, dashboards, and selection interfaces. Should clearly indicate the report's content and purpose. The primary identifier used by business users to locate specific reports."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of the report's purpose, content, calculation methods, and intended usage. Used for report discovery and self-service analytics. Should include information about data sources, refresh frequency, and interpretation guidelines."
+                    },
+                    {
+                        "column_name": "folderid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference to the organizational location where this report is stored in the report catalog hierarchy. Determines report visibility and categorization. Essential for maintaining a structured analytics repository with logical navigation."
+                    },
+                    {
+                        "column_name": "model",
+                        "data_type": "integer",
+                        "description": "Entity type or data source that serves as the primary foundation for this report (request, problem, change, etc.). Defines the starting point for data relationships and available fields. Controls which objects and properties can be included in the report."
+                    },
+                    {
+                        "column_name": "reportlayout",
+                        "data_type": "integer",
+                        "description": "Design template or structural configuration controlling how data is presented in the report output. Determines row/column arrangements, grouping behavior, and overall format. Affects both screen display and export formats like PDF or Excel."
+                    },
+                    {
+                        "column_name": "top",
+                        "data_type": "integer",
+                        "description": "Maximum number of records to include in the report results. Used for performance optimization and focusing on most relevant data. Prevents overwhelming users with excessive data points while ensuring reasonable execution times."
+                    },
+                    {
+                        "column_name": "includechart",
+                        "data_type": "boolean",
+                        "description": "Boolean flag controlling whether the report includes graphical visualization alongside tabular data. When enabled, generates charts or graphs based on report data. Enhances data interpretation through visual pattern recognition."
+                    },
+                    {
+                        "column_name": "visualizationtype",
+                        "data_type": "character varying",
+                        "description": "Specific chart or graph format to be used when includechart is enabled (bar, line, pie, etc.). Determines the visual representation style best suited to the data patterns. Should be selected based on the analytical purpose and data characteristics."
+                    }
+                ]
+            },
+            {
+                "table_name": "patch",
+                "tb_description": "Comprehensive patch management repository that catalogs software updates and security fixes for organizational systems. Tracks critical patch metadata including severity levels, release timing, system compatibility, and deployment requirements. Enables patch compliance reporting and vulnerability management through detailed categorization. Includes installation behavior specifications and rollback capabilities through patchuninstallationsupported flag. Patch deployment status facilitates audit compliance and security posture reporting. Links to specific operating systems or applications through osapplicationid foreign key.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each patch record in the system. Used in patch deployment tracking and compliance reporting. Forms relationships with deployment scheduling and execution records."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified the patch record. Important for change tracking and security compliance documentation."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the patch information was last updated. Used for version control and ensuring patch information currency. Automatically updated with each record change."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that indicates which administrator initially created or imported the patch record. Provides accountability for patch catalog management."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the patch was first added to the system catalog. Distinct from the patch release date, this tracks when the organization became aware of the patch."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "System-assigned identifier or vendor-provided code for the patch. Often includes nomenclature like KB numbers, CVE references, or product-specific identifiers. Used in technical documentation and deployment manifests for precise patch identification."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Comprehensive explanation of what the patch addresses, including bugs fixed, vulnerabilities remediated, or features enhanced. Provides technical context for impact assessment and deployment planning. Should include vendor documentation references and technical details."
+                    },
+                    {
+                        "column_name": "severity",
+                        "data_type": "integer",
+                        "description": "Classification of the patch's importance based on security impact, stability issues, or functional improvements. Common values include Critical, Important, Moderate, or Low. Determines deployment urgency and testing depth in patch management workflows."
+                    },
+                    {
+                        "column_name": "releasedate",
+                        "data_type": "bigint",
+                        "description": "Date when the patch was officially published by the vendor. Used for patch age analysis, compliance reporting, and SLA measurement for patch deployment timeliness. Essential for vulnerability management metrics and security posture reporting."
+                    },
+                    {
+                        "column_name": "osapplicationid",
+                        "data_type": "bigint",
+                        "description": "Foreign key reference identifying which operating system or application this patch applies to. Links to product records for complete software context. Essential for compatibility assessment and targeted deployment planning."
+                    },
+                    {
+                        "column_name": "category",
+                        "data_type": "integer",
+                        "description": "Classification of the patch type (security, bug fix, feature enhancement, cumulative update, etc.). Influences deployment approval workflows and testing requirements. Used for filtering and reporting on patch management activities."
+                    },
+                    {
+                        "column_name": "manuallyprovided",
+                        "data_type": "boolean",
+                        "description": "Flag indicating whether this patch was manually added to the system versus automatically discovered through integration. When enabled, may require additional verification of metadata accuracy. Affects trust levels in automated deployment processes."
+                    },
+                    {
+                        "column_name": "patchuninstallationsupported",
+                        "data_type": "boolean",
+                        "description": "Flag indicating whether the patch can be rolled back or uninstalled if problems occur after deployment. Critical for risk assessment and fallback planning. Affects testing requirements and deployment window scheduling."
+                    },
+                    {
+                        "column_name": "rebootbehaviour",
+                        "data_type": "integer",
+                        "description": "Specification of whether system restart is required during or after patch installation. Values typically include Required, Recommended, Optional, or None. Critical for deployment planning and service disruption scheduling."
+                    },
+                    {
+                        "column_name": "source",
+                        "data_type": "integer",
+                        "description": "Identifier for the origin of this patch (vendor site, WSUS, third-party provider, etc.). Used for verification and automated update configuration. Important for security validation and trusted source confirmation."
+                    },
+                    {
+                        "column_name": "status",
+                        "data_type": "integer",
+                        "description": "Current state of the patch in the organizational deployment lifecycle (New, Approved, Testing, Deployed, etc.). Controls visibility in deployment schedules and compliance reporting. Tracks progression through the patch management process."
+                    },
+                    {
+                        "column_name": "title",
+                        "data_type": "text",
+                        "description": "Human-readable name or summary headline for the patch as provided by the vendor. Often more descriptive than the technical name field. Used in communications, bulletins, and user-facing notifications about upcoming patch deployments."
+                    }
+                ]
+            },
+            {
+                "table_name": "flotorole",
+                "tb_description": "Security framework table that defines access control profiles assignable to users. Implements role-based access control (RBAC) throughout the platform. Each role encapsulates specific permissions that determine functional capabilities and data visibility. System-defined roles are identified through systemname and isdefault flags. Role assignments determine menu visibility, allowed actions, and recordset filtering across the application. Multiple roles can be assigned to users to create granular permission matrices that align with organizational security policies.",
+                "columns": [
+                    {
+                        "column_name": "id",
+                        "data_type": "bigint",
+                        "description": "Primary key uniquely identifying each security role definition. Used in role-to-user assignment relationships that determine access permissions throughout the application."
+                    },
+                    {
+                        "column_name": "updatedbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that identifies which administrator last modified the role definition. Critical for security governance and compliance audit trails."
+                    },
+                    {
+                        "column_name": "updatedtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp recording when the role definition was last modified. Important for security change management documentation and access control reviews."
+                    },
+                    {
+                        "column_name": "createdbyid",
+                        "data_type": "bigint",
+                        "description": "Foreign key referencing flotouser.id that indicates which administrator initially created the role. Provides accountability tracking for security governance."
+                    },
+                    {
+                        "column_name": "createdtime",
+                        "data_type": "bigint",
+                        "description": "Timestamp marking when the role was initially defined in the system. Used for security configuration lifecycle management and periodic review scheduling."
+                    },
+                    {
+                        "column_name": "name",
+                        "data_type": "character varying",
+                        "description": "Display name of the security role shown in administrative interfaces and permission reports. Used when assigning roles to users and in security audit documentation. Should clearly describe the functional purpose or access level of the role."
+                    },
+                    {
+                        "column_name": "description",
+                        "data_type": "text",
+                        "description": "Detailed explanation of the role's access rights, intended audience, and usage guidelines. Used by administrators for role selection and governance documentation. Should outline the specific permissions granted and typical job functions associated with this role."
+                    },
+                    {
+                        "column_name": "roletype",
+                        "data_type": "integer",
+                        "description": "Classification of the role's general category or access pattern (administrative, operational, reporting, etc.). Determines inheritance behavior and permission grouping logic. Helps organize roles in selection interfaces and simplifies role management."
+                    },
+                    {
+                        "column_name": "systemname",
+                        "data_type": "character varying",
+                        "description": "Internal technical identifier used in security framework, API access control, and integration points. Unlike the display name, remains consistent across upgrades and localization. Critical for stable security policy enforcement and programmatic access control."
+                    },
+                    {
+                        "column_name": "isdefault",
+                        "data_type": "boolean",
+                        "description": "Flag indicating this role is automatically assigned to new users meeting specific criteria. When enabled, affects automatic provisioning and default access control. System-defined default roles typically cannot be deleted to preserve core security functions."
+                    }
+                ]
+            }
+        ]
     }
-  ]
-  
+]
