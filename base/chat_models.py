@@ -48,4 +48,10 @@ chat_gemini_flash = ChatGoogleGenerativeAI(
     temperature=0,
     google_api_key=os.getenv("GOOGLE_API_KEY")
 )
+
+chat_gemini_flash_lite = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash-lite-001",  
+    temperature=0,
+    google_api_key=os.getenv("GOOGLE_API_KEY")
+)
  
