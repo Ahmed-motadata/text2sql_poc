@@ -2,8 +2,9 @@ langchain
 langchain_core
 langchain_community
 openai
-dotenv
+python-dotenv
 langchain_openai
 langchain_groq
 langchain_google_genai
-pyscopg2
+psycopg2-binary
+numpy
