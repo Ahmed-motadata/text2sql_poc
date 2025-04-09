@@ -1,0 +1,38 @@
+[
+  {
+    "table_name": "flotouser",
+    "token_count_with_columns_name": 2,
+    "token_count_with_columns_name_description_dt": 85,
+    "column_count": 2,
+    "columns": [
+      {
+        "name": "id",
+        "token_count_with_columns_name": 1,
+        "token_count_with_columns_name_description_dt": 41
+      },
+      {
+        "name": "name",
+        "token_count_with_columns_name": 1,
+        "token_count_with_columns_name_description_dt": 44
+      }
+    ]
+  },
+  {
+    "table_name": "priority",
+    "token_count_with_columns_name": 2,
+    "token_count_with_columns_name_description_dt": 56,
+    "column_count": 2,
+    "columns": [
+      {
+        "name": "id",
+        "token_count_with_columns_name": 1,
+        "token_count_with_columns_name_description_dt": 8
+      },
+      {
+        "name": "name",
+        "token_count_with_columns_name": 1,
+        "token_count_with_columns_name_description_dt": 48
+      }
+    ]
+  }
+]
