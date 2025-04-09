@@ -1212,98 +1212,82 @@
                     {
                         "name": "id",
                         "data_type": "bigint",
-                        "description": "Primary key uniquely identifying each project initiative record. Referenced by tasks, changes, and resource allocations. Central identifier for all project management activities and documentation.",
-                        "name": "project"
+                        "description": "Primary key uniquely identifying each project initiative record. Referenced by tasks, changes, and resource allocations. Central identifier for all project management activities and documentation."                        
                     },
                     {
                         "name": "updatedbyid",
                         "data_type": "bigint",
-                        "description": "Foreign key referencing flotouser.id that identifies which user last modified the project record. Important for project governance, audit trail, and change control. Documents accountability for project plan modifications.",
-                        "name": "project"
+                        "description": "Foreign key referencing flotouser.id that identifies which user last modified the project record. Important for project governance, audit trail, and change control. Documents accountability for project plan modifications."                        
                     },
                     {
                         "name": "updatedtime",
                         "data_type": "bigint",
-                        "description": "Timestamp recording when the project information was last modified. Used for tracking project evolution and documentation currency. Automatically updated with each record change and status transition.",
-                        "name": "project"
+                        "description": "Timestamp recording when the project information was last modified. Used for tracking project evolution and documentation currency. Automatically updated with each record change and status transition."                        
                     },
                     {
                         "name": "createdbyid",
                         "data_type": "bigint",
-                        "description": "Foreign key referencing flotouser.id that identifies which user initially defined this project. Usually the project sponsor or initiator. Critical for project origin tracking and governance accountability.",
-                        "name": "project"
+                        "description": "Foreign key referencing flotouser.id that identifies which user initially defined this project. Usually the project sponsor or initiator. Critical for project origin tracking and governance accountability."                        
                     },
                     {
                         "name": "createdtime",
                         "data_type": "bigint",
-                        "description": "Timestamp marking when the project was initially created in the system. Represents the formal start of project tracking. Used for portfolio timeline analysis and organizational initiative frequency monitoring.",
-                        "name": "project"
+                        "description": "Timestamp marking when the project was initially created in the system. Represents the formal start of project tracking. Used for portfolio timeline analysis and organizational initiative frequency monitoring."                        
                     },
                     {
                         "name": "name",
                         "data_type": "character varying",
-                        "description": "Unique internal reference code for the project that follows organizational project numbering patterns (e.g., \"PRJ-2023-002\"). Used in technical communications and cross-referencing. Distinct from the display name which is more descriptive.",
-                        "name": "project"
+                        "description": "Unique internal reference code for the project that follows organizational project numbering patterns (e.g., \"PRJ-2023-002\"). Used in technical communications and cross-referencing. Distinct from the display name which is more descriptive."                        
                     },
                     {
                         "name": "description",
                         "data_type": "text",
-                        "description": "Comprehensive documentation of the project's purpose, scope, objectives, deliverables, and constraints. Core component of project definition used for stakeholder alignment and scope management. Should include business justification and success criteria.",
-                        "name": "project"
+                        "description": "Comprehensive documentation of the project's purpose, scope, objectives, deliverables, and constraints. Core component of project definition used for stakeholder alignment and scope management. Should include business justification and success criteria."                        
                     },
                     {
                         "name": "displayname",
                         "data_type": "character varying",
-                        "description": "User-friendly project title used in reports, dashboards, and communications. More descriptive than the internal reference name. Should clearly convey the project's core purpose and appear in portfolio views and executive reporting.",
-                        "name": "project"
+                        "description": "User-friendly project title used in reports, dashboards, and communications. More descriptive than the internal reference name. Should clearly convey the project's core purpose and appear in portfolio views and executive reporting."                        
                     },
                     {
                         "name": "startdate",
                         "data_type": "bigint",
-                        "description": "Planned or actual commencement date for project activities. Used for resource scheduling, dependency management, and portfolio timeline visualization. Critical for project sequencing and capacity planning across the organization.",
-                        "name": "project"
+                        "description": "Planned or actual commencement date for project activities. Used for resource scheduling, dependency management, and portfolio timeline visualization. Critical for project sequencing and capacity planning across the organization."                        
                     },
                     {
                         "name": "enddate",
                         "data_type": "bigint",
-                        "description": "Targeted completion date for the project. Used for deadline planning, milestone scheduling, and portfolio management. May be adjusted as project progresses and estimates are refined. Critical for measuring on-time delivery performance.",
-                        "name": "project"
+                        "description": "Targeted completion date for the project. Used for deadline planning, milestone scheduling, and portfolio management. May be adjusted as project progresses and estimates are refined. Critical for measuring on-time delivery performance."                        
                     },
                     {
                         "name": "technicianid",
                         "data_type": "bigint",
-                        "description": "Foreign key reference to flotouser.id identifying the project manager or lead responsible for delivery. The primary accountable person for project execution and status reporting. Central point of contact for project stakeholders and governance.",
-                        "name": "project"
+                        "description": "Foreign key reference to flotouser.id identifying the project manager or lead responsible for delivery. The primary accountable person for project execution and status reporting. Central point of contact for project stakeholders and governance."                        
                     },
                     {
                         "name": "projecttypeid",
                         "data_type": "bigint",
-                        "description": "Foreign key reference categorizing the nature of the project (infrastructure, application, service introduction, etc.). Determines methodology approach, governance requirements, and reporting cadence. Influences approval workflows and documentation templates.",
-                        "name": "project"
+                        "description": "Foreign key reference categorizing the nature of the project (infrastructure, application, service introduction, etc.). Determines methodology approach, governance requirements, and reporting cadence. Influences approval workflows and documentation templates."                        
                     },
                     {
                         "name": "projectstatus",
                         "data_type": "integer",
-                        "description": "Current state of the project in its lifecycle (planning, execution, hold, completed, etc.). Used for portfolio filtering, progress reporting, and resource allocation decisions. Critical for executive dashboards and organizational delivery metrics.",
-                        "name": "project"
+                        "description": "Current state of the project in its lifecycle (planning, execution, hold, completed, etc.). Used for portfolio filtering, progress reporting, and resource allocation decisions. Critical for executive dashboards and organizational delivery metrics."                        
                     },
                     {
                         "name": "priorityid",
                         "data_type": "bigint",
-                        "description": "Foreign key reference to priority.id indicating the project's relative importance and resource precedence. Influences conflict resolution when resources are constrained. Often determined by executive sponsors based on strategic alignment and business value.",
-                        "name": "project"
+                        "description": "Foreign key reference to priority.id indicating the project's relative importance and resource precedence. Influences conflict resolution when resources are constrained. Often determined by executive sponsors based on strategic alignment and business value."                        
                     },
                     {
                         "name": "risktypeid",
                         "data_type": "bigint",
-                        "description": "Foreign key reference indicating the assessed risk profile of the project. Determines oversight intensity, contingency requirements, and governance checkpoints. Higher risk projects typically require more frequent review and more detailed reporting.",
-                        "name": "project"
+                        "description": "Foreign key reference indicating the assessed risk profile of the project. Determines oversight intensity, contingency requirements, and governance checkpoints. Higher risk projects typically require more frequent review and more detailed reporting."                        
                     },
                     {
                         "name": "locationid",
                         "data_type": "bigint",
-                        "description": "Foreign key reference to location.id identifying the primary site affected by or involved in the project. Used for regional portfolio management and site-specific resource allocation. Critical for projects involving physical infrastructure or location-specific implementations.",
-                        "name": "project"
+                        "description": "Foreign key reference to location.id identifying the primary site affected by or involved in the project. Used for regional portfolio management and site-specific resource allocation. Critical for projects involving physical infrastructure or location-specific implementations."                    
                     }
                 ]
             },
