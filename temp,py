@@ -5,33 +5,33 @@ initial_db = [
         "db_description": "This database is designed to store and manage all IT Service Management (ITSM) related data, including service requests, change management records, problem tracking logs, user profiles, asset details, and workflow histories. It serves as the core backend for maintaining the lifecycle of IT operations and support activities.",
         "tables": [
             {
-                "table_name": "request",
-                "tb_description": "Central table that tracks IT service requests throughout their lifecycle. Contains comprehensive metadata including creation and update timestamps, assignment details, priority levels, and status transitions. Links to multiple reference tables like status, priority, and category to facilitate ticket classification, routing, and resolution. User relationships are maintained through requesterid and technicianid fields that reference flotouser table. SLA compliance is tracked through dueby field and status transitions.",
+                "name": "request",
+                "description": "Central table that tracks IT service requests throughout their lifecycle. Contains comprehensive metadata including creation and update timestamps, assignment details, priority levels, and status transitions. Links to multiple reference tables like status, priority, and category to facilitate ticket classification, routing, and resolution. User relationships are maintained through requesterid and technicianid fields that reference flotouser table. SLA compliance is tracked through dueby field and status transitions.",
                 "columns": [
                     {
-                        "column_name": "id",
-                        "data_type": "bigint",
+                        "name": "id",
+                        "type": "bigint",
                         "description": "Primary key that uniquely identifies each service request record. Used as reference target for task.refid when task.refmodel refers to requests. Follows system-wide numbering sequence for consistent tracking across the platform."
                     },
                     {
-                        "column_name": "updatedbyid",
-                        "data_type": "bigint",
+                        "name": "updatedbyid",
+                        "type": "bigint",
                         "description": "Foreign key referencing flotouser.id to identify who last modified the request. Essential for audit trail and accountability tracking. Updates automatically with each record modification."
                     },
                 ]
             },
             {
-                "table_name": "flotouser",
-                "tb_description": "Core user repository that stores all system user profiles. Maintains hierarchical relationships through managerid field and organizational context via departmentid and locationid references. Controls system access through authentication parameters and access level settings. User records connect to multiple operational tables including requests, changes, problems, and tasks through various foreign key relationships. Contains essential contact information and preferences that support notification workflows and reporting.",
+                "name": "flotouser",
+                "description": "Core user repository that stores all system user profiles. Maintains hierarchical relationships through managerid field and organizational context via departmentid and locationid references. Controls system access through authentication parameters and access level settings. User records connect to multiple operational tables including requests, changes, problems, and tasks through various foreign key relationships. Contains essential contact information and preferences that support notification workflows and reporting.",
                 "columns": [
                     {
-                        "column_name": "id",
-                        "data_type": "bigint",
+                        "name": "id",
+                        "type": "bigint",
                         "description": "Primary key uniquely identifying each user record. Referenced by multiple tables including request.requesterid, request.technicianid, and task.technicianid to establish user relationships throughout the system."
                     },
                     {
-                        "column_name": "updatedbyid",
-                        "data_type": "bigint",
+                        "name": "updatedbyid",
+                        "type": "bigint",
                         "description": "Self-referencing foreign key to flotouser.id that identifies which administrator last modified this user record. Important for security audit trails and compliance reporting."
                     },
                 ]
