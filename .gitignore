@@ -5,3 +5,8 @@ functions.ipynb
 process_db copy.py
 db_token_counter.py
 token_counter.ipynb
+get_table_token_count.json
+get_column_token_count.json
+__pycache__/
+get_token_count.json
+pgvector

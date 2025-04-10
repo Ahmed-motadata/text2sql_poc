@@ -109,7 +109,7 @@ def get_token_count(initial_db):
         for col in cols:
             col_name = col.get("name", "")
             col_desc = col.get("description", "")
-            col_type = col.get("type", "")
+            col_type = col.get("data_type", "")
             # Compute token counts for the column. (The logic here can be modified as needed.)
             # token_count: tokens for (column name + column description)
             token_count = get_token_count_for_text(f"{col_name} {col_desc}")
@@ -125,9 +125,9 @@ def get_token_count(initial_db):
                 "name": col_name,
                 "description": col_desc,
                 "data_type": col_type,
-                "token_count": token_count,
-                "token_count_with_column_name": token_count_with_column_name,
-                "token_count_with_column_name_and_description_and_dt": token_count_with_column_name_and_desc_dt
+                "column_token_count": token_count,
+                "column_token_count_with_column_name": token_count_with_column_name,
+                "column_token_count_with_column_name_and_description_and_dt": token_count_with_column_name_and_desc_dt
             })
         
         # For the table-level output, add the table's own token count
@@ -139,9 +139,9 @@ def get_token_count(initial_db):
             "name": table_name,
             "description": table_description,
             "column_count": len(cols),
-            "token_count": table_token_count,
-            "token_columns_with_columns_name": token_columns_with_columns_name,
-            "token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt,
+            "table_token_count": table_token_count,
+            "table_token_columns_with_columns_name": token_columns_with_columns_name,
+            "table_token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt,
             "columns": processed_columns
         })
         
@@ -165,7 +165,7 @@ def get_token_count(initial_db):
     }
     
     # Write the processed database structure to a JSON file.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/get_token_count.json", "w") as outfile:
+    with open("/home/ahmedraza/genBI/Text2SQL/database/processed_db.json", "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
     return processed_db

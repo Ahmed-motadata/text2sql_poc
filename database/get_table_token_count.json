@@ -2,141 +2,141 @@
   {
     "table_name": "request",
     "column_count": 90,
-    "token_count": 84,
-    "token_columns_with_columns_name": 355,
-    "token_with_columns_name_and_description_and_dt": 2058
+    "table_token_count": 84,
+    "table_token_columns_with_columns_name": 355,
+    "table_token_with_columns_name_and_description_and_dt": 2058
   },
   {
     "table_name": "flotouser",
     "column_count": 76,
-    "token_count": 78,
-    "token_columns_with_columns_name": 310,
-    "token_with_columns_name_and_description_and_dt": 1577
+    "table_token_count": 78,
+    "table_token_columns_with_columns_name": 310,
+    "table_token_with_columns_name_and_description_and_dt": 1577
   },
   {
     "table_name": "status",
     "column_count": 22,
-    "token_count": 94,
-    "token_columns_with_columns_name": 140,
-    "token_with_columns_name_and_description_and_dt": 841
+    "table_token_count": 94,
+    "table_token_columns_with_columns_name": 140,
+    "table_token_with_columns_name_and_description_and_dt": 841
   },
   {
     "table_name": "priority",
     "column_count": 17,
-    "token_count": 82,
-    "token_columns_with_columns_name": 115,
-    "token_with_columns_name_and_description_and_dt": 587
+    "table_token_count": 82,
+    "table_token_columns_with_columns_name": 115,
+    "table_token_with_columns_name_and_description_and_dt": 587
   },
   {
     "table_name": "impact",
     "column_count": 17,
-    "token_count": 101,
-    "token_columns_with_columns_name": 134,
-    "token_with_columns_name_and_description_and_dt": 710
+    "table_token_count": 101,
+    "table_token_columns_with_columns_name": 134,
+    "table_token_with_columns_name_and_description_and_dt": 710
   },
   {
     "table_name": "department",
     "column_count": 14,
-    "token_count": 71,
-    "token_columns_with_columns_name": 99,
-    "token_with_columns_name_and_description_and_dt": 505
+    "table_token_count": 71,
+    "table_token_columns_with_columns_name": 99,
+    "table_token_with_columns_name_and_description_and_dt": 505
   },
   {
     "table_name": "location",
     "column_count": 16,
-    "token_count": 83,
-    "token_columns_with_columns_name": 113,
-    "token_with_columns_name_and_description_and_dt": 619
+    "table_token_count": 83,
+    "table_token_columns_with_columns_name": 113,
+    "table_token_with_columns_name_and_description_and_dt": 619
   },
   {
     "table_name": "product",
     "column_count": 15,
-    "token_count": 81,
-    "token_columns_with_columns_name": 111,
-    "token_with_columns_name_and_description_and_dt": 570
+    "table_token_count": 81,
+    "table_token_columns_with_columns_name": 111,
+    "table_token_with_columns_name_and_description_and_dt": 570
   },
   {
     "table_name": "change",
     "column_count": 98,
-    "token_count": 109,
-    "token_columns_with_columns_name": 394,
-    "token_with_columns_name_and_description_and_dt": 1973
+    "table_token_count": 109,
+    "table_token_columns_with_columns_name": 394,
+    "table_token_with_columns_name_and_description_and_dt": 1973
   },
   {
     "table_name": "release",
     "column_count": 86,
-    "token_count": 110,
-    "token_columns_with_columns_name": 375,
-    "token_with_columns_name_and_description_and_dt": 1866
+    "table_token_count": 110,
+    "table_token_columns_with_columns_name": 375,
+    "table_token_with_columns_name_and_description_and_dt": 1866
   },
   {
     "table_name": "task",
     "column_count": 33,
-    "token_count": 59,
-    "token_columns_with_columns_name": 125,
-    "token_with_columns_name_and_description_and_dt": 953
+    "table_token_count": 59,
+    "table_token_columns_with_columns_name": 125,
+    "table_token_with_columns_name_and_description_and_dt": 953
   },
   {
     "table_name": "category",
     "column_count": 19,
-    "token_count": 98,
-    "token_columns_with_columns_name": 135,
-    "token_with_columns_name_and_description_and_dt": 696
+    "table_token_count": 98,
+    "table_token_columns_with_columns_name": 135,
+    "table_token_with_columns_name_and_description_and_dt": 696
   },
   {
     "table_name": "company",
     "column_count": 12,
-    "token_count": 85,
-    "token_columns_with_columns_name": 108,
-    "token_with_columns_name_and_description_and_dt": 476
+    "table_token_count": 85,
+    "table_token_columns_with_columns_name": 108,
+    "table_token_with_columns_name_and_description_and_dt": 476
   },
   {
     "table_name": "vendor",
     "column_count": 21,
-    "token_count": 83,
-    "token_columns_with_columns_name": 122,
-    "token_with_columns_name_and_description_and_dt": 753
+    "table_token_count": 83,
+    "table_token_columns_with_columns_name": 122,
+    "table_token_with_columns_name_and_description_and_dt": 753
   },
   {
     "table_name": "problem",
     "column_count": 77,
-    "token_count": 107,
-    "token_columns_with_columns_name": 341,
-    "token_with_columns_name_and_description_and_dt": 1713
+    "table_token_count": 107,
+    "table_token_columns_with_columns_name": 341,
+    "table_token_with_columns_name_and_description_and_dt": 1713
   },
   {
     "table_name": "project",
     "column_count": 29,
-    "token_count": 112,
-    "token_columns_with_columns_name": 171,
-    "token_with_columns_name_and_description_and_dt": 954
+    "table_token_count": 112,
+    "table_token_columns_with_columns_name": 171,
+    "table_token_with_columns_name_and_description_and_dt": 954
   },
   {
     "table_name": "reportcolumn",
     "column_count": 13,
-    "token_count": 96,
-    "token_columns_with_columns_name": 128,
-    "token_with_columns_name_and_description_and_dt": 603
+    "table_token_count": 96,
+    "table_token_columns_with_columns_name": 128,
+    "table_token_with_columns_name_and_description_and_dt": 603
   },
   {
     "table_name": "reportdefinition",
     "column_count": 26,
-    "token_count": 101,
-    "token_columns_with_columns_name": 158,
-    "token_with_columns_name_and_description_and_dt": 813
+    "table_token_count": 101,
+    "table_token_columns_with_columns_name": 158,
+    "table_token_with_columns_name_and_description_and_dt": 813
   },
   {
     "table_name": "patch",
     "column_count": 42,
-    "token_count": 86,
-    "token_columns_with_columns_name": 178,
-    "token_with_columns_name_and_description_and_dt": 1114
+    "table_token_count": 86,
+    "table_token_columns_with_columns_name": 178,
+    "table_token_with_columns_name_and_description_and_dt": 1114
   },
   {
     "table_name": "flotorole",
     "column_count": 10,
-    "token_count": 92,
-    "token_columns_with_columns_name": 112,
-    "token_with_columns_name_and_description_and_dt": 438
+    "table_token_count": 92,
+    "table_token_columns_with_columns_name": 112,
+    "table_token_with_columns_name_and_description_and_dt": 438
   }
 ]

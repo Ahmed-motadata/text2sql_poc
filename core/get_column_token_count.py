@@ -59,14 +59,14 @@ def get_column_token_count(initial_db, input_value):
             aggregated_token_combined += token_combined
             columns_output.append({
                 "name": col_name,
-                "token_count_with_columns_name": token_name,
-                "token_count_with_columns_name_description_dt": token_combined
+                "column_token_count_with_columns_name": token_name,
+                "column_token_count_with_columns_name_description_dt": token_combined
             })
         
         return {
             "table_name": table.get("name", ""),
-            "token_count_with_columns_name": aggregated_token_name,
-            "token_count_with_columns_name_description_dt": aggregated_token_combined,
+            "table_token_count_with_columns_name": aggregated_token_name,
+            "table_token_count_with_columns_name_description_dt": aggregated_token_combined,
             "column_count": len(columns),
             "columns": columns_output
         }
@@ -101,11 +101,11 @@ if __name__ == "__main__":
     # Define the input value for processing. You can modify this as required.
     get_token_count_input = [
         {
-            "table": "flotouser",
+            "table": "request",
             "column": ["id", "name"]
         },
         {
-            "table": "priority",
+            "table": "flotouser", 
             "column": ["id", "name"]
         }
     ]

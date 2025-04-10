@@ -68,15 +68,15 @@ def get_table_token_count(initial_db, input_value):
                         "token_count_with_columns_name_description_dt": 0}
 
         # Calculate the final values by adding table-level token count and column-level token counts.
-        token_columns_with_columns_name = table_token_count + col_data["token_count_with_columns_name"]
-        token_with_columns_name_and_description_and_dt = table_token_count + col_data["token_count_with_columns_name_description_dt"]
+        token_columns_with_columns_name = table_token_count + col_data["table_token_count_with_columns_name"]
+        token_with_columns_name_and_description_and_dt = table_token_count + col_data["table_token_count_with_columns_name_description_dt"]
 
         return {
             "table_name": table_name,
             "column_count": col_data["column_count"],
-            "token_count": table_token_count,
-            "token_columns_with_columns_name": token_columns_with_columns_name,
-            "token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt
+            "table_token_count": table_token_count,
+            "table_token_columns_with_columns_name": token_columns_with_columns_name,
+            "table_token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt
         }
 
     # Determine which tables to process.
