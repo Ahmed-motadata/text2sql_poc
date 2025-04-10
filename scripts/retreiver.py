@@ -33,7 +33,7 @@ def retrieve_table_docs(table_name: str) -> List[Document]:
 
     results = retriever.vectorstore.similarity_search_with_score(
         query=f"Table: {table_name}",
-        k=20,
+        k=1,
         filter={"type": "table"}
     )
 
@@ -62,7 +62,7 @@ def retrieve_column_docs(table_name: str, column_list: List[str]) -> List[Docume
         for column in column_list:
             results = retriever.vectorstore.similarity_search_with_score(
                 query=f"Column: {column}",
-                k=5,
+                k=1,
                 filter={"type": "column", "table_name": table_name}
             )
             column_docs.extend([doc for doc, _ in results])
@@ -99,8 +99,8 @@ def run_retrieval_pipeline(input_json: Dict[str, str]) -> Dict[str, List[Dict[st
 if __name__ == "__main__":
     # Example usage:
     input_json = {
-        "table": "request",
-        "columns": "id,name,technicianid"
+        "table": "flotouser",
+        "columns": "id,name"
     }
 
     output = run_retrieval_pipeline(input_json)
