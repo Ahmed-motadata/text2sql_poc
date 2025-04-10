@@ -29,13 +29,14 @@ from base.chat_models import (
     chat_gemini_flash_lite
 )
 
+# Import embedding model functions instead of instances
 from base.embed_models import (
-    openai_embed_ada,
-    openai_embed_3_small,
-    openai_embed_3_large,
-    jina_embed_base,
-    jina_embed_clip,
-    jina_embed_small
+    get_openai_embed_ada,
+    get_openai_embed_3_small,
+    get_openai_embed_3_large,
+    get_jina_embed_base,
+    get_jina_embed_clip,
+    get_jina_embed_small
 )
 
 # Import prompts
@@ -77,8 +78,8 @@ DEFAULT_LLM = chat_gemini_flash
 # Default query generation LLM model (used specifically for generating SQL queries)
 DEFAULT_QUERY_LLM = chat_gemini_flash
 
-# Default embedding model (used for vectorizing text)
-DEFAULT_EMBEDDING_MODEL = jina_embed_base
+# Default embedding model function (used for vectorizing text)
+DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base
 
 # Default prompt for SQL generation
 DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
@@ -133,13 +134,14 @@ LLM_MODEL_MAPPING = {
     LLMModel.GEMINI_FLASH_LITE: chat_gemini_flash_lite,
 }
 
+# Mapping from model enum to embedding model functions
 EMBEDDING_MODEL_MAPPING = {
-    EmbeddingModel.OPENAI_ADA: openai_embed_ada,
-    EmbeddingModel.OPENAI_3_SMALL: openai_embed_3_small,
-    EmbeddingModel.OPENAI_3_LARGE: openai_embed_3_large,
-    EmbeddingModel.JINA_BASE: jina_embed_base,
-    EmbeddingModel.JINA_CLIP: jina_embed_clip,
-    EmbeddingModel.JINA_SMALL: jina_embed_small,
+    EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
+    EmbeddingModel.OPENAI_3_SMALL: get_openai_embed_3_small,
+    EmbeddingModel.OPENAI_3_LARGE: get_openai_embed_3_large,
+    EmbeddingModel.JINA_BASE: get_jina_embed_base,
+    EmbeddingModel.JINA_CLIP: get_jina_embed_clip,
+    EmbeddingModel.JINA_SMALL: get_jina_embed_small,
 }
 
 # =========== HELPER FUNCTIONS ===========
@@ -195,14 +197,15 @@ def get_embedding_model(model_name: Optional[str] = None):
         The corresponding embedding model instance
     """
     if not model_name:
-        return DEFAULT_EMBEDDING_MODEL
+        return DEFAULT_EMBEDDING_MODEL_FUNC()
         
     try:
         model_enum = EmbeddingModel(model_name)
-        return EMBEDDING_MODEL_MAPPING[model_enum]
+        model_func = EMBEDDING_MODEL_MAPPING[model_enum]
+        return model_func()
     except (ValueError, KeyError):
         print(f"Warning: Embedding model '{model_name}' not found. Using default embedding model.")
-        return DEFAULT_EMBEDDING_MODEL
+        return DEFAULT_EMBEDDING_MODEL_FUNC()
 
 def get_prompt(prompt_type: str = "generation"):
     """
