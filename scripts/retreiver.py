@@ -1,10 +1,11 @@
 import sys
 import os
  
-# Add the 'base' folder to the import path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "base")))
+# Add the parent directory to the path to allow imports from base
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
  
-from vector_store import vector_store
+# Import the vector_store module correctly
+from base.vector_store import vector_store
  
 results = vector_store.similarity_search("SHow me request table's columns?", k=1)
 for doc in results:
