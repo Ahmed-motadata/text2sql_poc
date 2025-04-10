@@ -115,7 +115,7 @@ def get_token_count(initial_db):
         for col in cols:
             col_name = col.get("name", "")
             col_desc = col.get("description", "")
-            col_type = col.get("type", "")
+            col_type = col.get("data_type", "")
             # Compute token counts for the column. (The logic here can be modified as needed.)
             # token_count: tokens for (column name + column description)
             token_count = get_token_count_for_text(f"{col_name} {col_desc}")
