@@ -390,7 +390,7 @@ def get_relevant_schema_for_query(
     """
     
     
-    from langchain_postgres import PGVector
+from langchain_postgres import PGVector
 from embed_models import get_jina_embed_base
  
 connection = "postgresql+psycopg://langchain:langchain@localhost:5432/langchain"
