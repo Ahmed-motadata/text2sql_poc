@@ -1,25 +1,24 @@
 from langchain_postgres import PGVector
-from langchain.vectorstores import VectorStore
-from typing import List, Dict, Any, Optional
 import sys
 import os
 
 # Add the parent directory to the path to allow imports from settings
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from settings.settings import get_embedding_model, DEFAULT_COLLECTION_NAME, VECTOR_STORE_SETTINGS
-
-# Initialize connection string
-connection_string = f"postgresql+psycopg://{VECTOR_STORE_SETTINGS.get('user', 'langchain')}:{VECTOR_STORE_SETTINGS.get('password', 'langchain')}@{VECTOR_STORE_SETTINGS['host']}:{VECTOR_STORE_SETTINGS['port']}/langchain"
+from settings.settings import get_embedding_model, PGVECTOR_CONNECTION_STRING, PGVECTOR_COLLECTION_NAME
+# Use the correct import path for embed_models
+from base.embed_models import get_jina_embed_base
 
 def get_vector_store(
-    collection_name: str = DEFAULT_COLLECTION_NAME,
+    collection_name: str = PGVECTOR_COLLECTION_NAME,
+    connection_string: str = PGVECTOR_CONNECTION_STRING,
     embedding_model = None
-) -> VectorStore:
+) -> PGVector:
     """
     Create and return a PGVector store instance with the specified configuration.
     
     Args:
         collection_name: Name of the collection in the vector store
+        connection_string: PostgreSQL connection string
         embedding_model: Embedding model to use (if None, uses default from settings)
         
     Returns:

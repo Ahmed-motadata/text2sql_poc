@@ -13,7 +13,11 @@ import os
 import sys
 from enum import Enum
 from typing import Dict, Any, Optional
+from dotenv import load_dotenv
  
+# Load environment variables
+load_dotenv()
+
 # Add parent directory to path to allow imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
  
@@ -103,17 +107,22 @@ DATABASE_SETTINGS = {
 }
  
 # =========== VECTOR STORE SETTINGS ===========
- 
-# Default Qdrant vector store settings
-VECTOR_STORE_SETTINGS = {
-    "host": os.getenv("QDRANT_HOST", "localhost"),
-    "port": int(os.getenv("QDRANT_PORT", 6333)),
-    "grpc_port": int(os.getenv("QDRANT_GRPC_PORT", 6334)) if os.getenv("QDRANT_GRPC_PORT") else None,
-    "api_key": os.getenv("QDRANT_API_KEY"),
-    "https": os.getenv("QDRANT_HTTPS", "False").lower() == "true",
-    "prefer_grpc": os.getenv("QDRANT_PREFER_GRPC", "False").lower() == "true",
-    "timeout": float(os.getenv("QDRANT_TIMEOUT", 10.0))
+
+# PostgreSQL vector store settings
+PGVECTOR_SETTINGS = {
+    "user": os.getenv("PGVECTOR_USER", "langchain"),
+    "password": os.getenv("PGVECTOR_PASSWORD", "langchain"),
+    "host": os.getenv("PGVECTOR_HOST", "localhost"),
+    "port": os.getenv("PGVECTOR_PORT", "5444"),
+    "dbname": os.getenv("PGVECTOR_DB", "langchain"),
 }
+
+# Build connection string
+PGVECTOR_CONNECTION_STRING = f"postgresql+psycopg://{PGVECTOR_SETTINGS['user']}:{PGVECTOR_SETTINGS['password']}@{PGVECTOR_SETTINGS['host']}:{PGVECTOR_SETTINGS['port']}/{PGVECTOR_SETTINGS['dbname']}"
+
+# Default collection name for vector store
+PGVECTOR_COLLECTION_NAME = os.getenv("PGVECTOR_COLLECTION", "T2sql_v3")
+ 
  
 # Default collection settings for schema metadata
 DEFAULT_COLLECTION_NAME = "text2sql_schema"
