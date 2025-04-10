@@ -1,5 +1,11 @@
 import tiktoken
 import json
+import sys
+import os
+
+# Add the parent directory to the path to allow imports from settings
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from settings.settings import DATABASE_SETTINGS
 from get_column_token_count import get_column_token_count  # Import the function from the separate file
 
 def get_token_count_for_text(text, model="gpt-3.5-turbo"):
@@ -43,7 +49,7 @@ def get_table_token_count(initial_db, input_value):
       - token_columns_with_columns_name
       - token_with_columns_name_and_description_and_dt
     
-    The final output (a list of such dictionaries) is stored in a JSON file ("get_table_token_count.json").
+    The final output (a list of such dictionaries) is stored in a JSON file.
     
     :param initial_db: The full database metadata.
     :param input_value: A list of table specifications; if empty, process the entire db.
@@ -68,15 +74,15 @@ def get_table_token_count(initial_db, input_value):
                         "token_count_with_columns_name_description_dt": 0}
 
         # Calculate the final values by adding table-level token count and column-level token counts.
-        token_columns_with_columns_name = table_token_count + col_data["table_token_count_with_columns_name"]
-        token_with_columns_name_and_description_and_dt = table_token_count + col_data["table_token_count_with_columns_name_description_dt"]
+        token_columns_with_columns_name = table_token_count + col_data["token_count_with_columns_name"]
+        token_with_columns_name_and_description_and_dt = table_token_count + col_data["token_count_with_columns_name_description_dt"]
 
         return {
             "table_name": table_name,
             "column_count": col_data["column_count"],
-            "table_token_count": table_token_count,
-            "table_token_columns_with_columns_name": token_columns_with_columns_name,
-            "table_token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt
+            "token_count": table_token_count,
+            "token_columns_with_columns_name": token_columns_with_columns_name,
+            "token_with_columns_name_and_description_and_dt": token_with_columns_name_and_description_and_dt
         }
 
     # Determine which tables to process.
@@ -92,16 +98,18 @@ def get_table_token_count(initial_db, input_value):
                 if table.get("name") in table_names_to_process:
                     results.append(process_table(table))
 
-    # Write results into a JSON file.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/get_table_token_count.json", "w") as outfile:
+    # Write results into a JSON file using the path from DATABASE_SETTINGS
+    output_path = DATABASE_SETTINGS["output_paths"]["table_token_count"]
+    with open(output_path, "w") as outfile:
         json.dump(results, outfile, indent=2)
 
     return results
 
 # Example usage:
 if __name__ == "__main__":
-    # Load initial_db from a JSON file.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/db_metadata.json", "r") as infile:
+    # Load initial_db from a JSON file using the centralized path
+    input_path = DATABASE_SETTINGS["input_db_path"]
+    with open(input_path, "r") as infile:
         initial_db = json.load(infile)
     
     # Define input_value.
@@ -112,4 +120,4 @@ if __name__ == "__main__":
 
     output = get_table_token_count(initial_db, get_token_count_input)
     
-    print("Table-level token count processed and stored in get_table_token_count.json")
+    print(f"Table-level token count processed and stored in {DATABASE_SETTINGS['output_paths']['table_token_count']}")

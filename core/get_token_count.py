@@ -1,5 +1,11 @@
 import tiktoken
 import json
+import sys
+import os
+
+# Add the parent directory to the path to allow imports from settings
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from settings.settings import DATABASE_SETTINGS
 from get_table_token_count import get_table_token_count
 from get_column_token_count import get_column_token_count
 
@@ -66,7 +72,7 @@ def get_token_count(initial_db):
          ]
       }
     
-    Finally, the processed database dictionary is stored in "processed_db.json".
+    Finally, the processed database dictionary is stored in a JSON file.
     
     :param initial_db: The full database metadata (list of database dictionaries).
     :return: The processed database dictionary.
@@ -109,7 +115,7 @@ def get_token_count(initial_db):
         for col in cols:
             col_name = col.get("name", "")
             col_desc = col.get("description", "")
-            col_type = col.get("data_type", "")
+            col_type = col.get("type", "")
             # Compute token counts for the column. (The logic here can be modified as needed.)
             # token_count: tokens for (column name + column description)
             token_count = get_token_count_for_text(f"{col_name} {col_desc}")
@@ -164,16 +170,24 @@ def get_token_count(initial_db):
         "tables": processed_tables
     }
     
-    # Write the processed database structure to a JSON file.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/processed_db.json", "w") as outfile:
+    # Write the processed database structure to a JSON file using the path from DATABASE_SETTINGS
+    token_count_path = DATABASE_SETTINGS["output_paths"]["token_count"]
+    with open(token_count_path, "w") as outfile:
+        json.dump(processed_db, outfile, indent=2)
+    
+    # Also save to processed_db.json
+    processed_db_path = DATABASE_SETTINGS["output_paths"]["processed_db"]
+    with open(processed_db_path, "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
     return processed_db
 
 if __name__ == "__main__":
-    # Load the initial_db from a JSON file.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/db_metadata.json", "r") as infile:
+    # Load the initial_db from a JSON file using the centralized path
+    input_path = DATABASE_SETTINGS["input_db_path"]
+    with open(input_path, "r") as infile:
         initial_db = json.load(infile)
     
     output = get_token_count(initial_db)
-    print("Processed DB token counts stored in processed_db.json")
+    
+    print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_paths']['processed_db']}")

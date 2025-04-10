@@ -1,5 +1,11 @@
 import tiktoken
 import json
+import sys
+import os
+
+# Add the parent directory to the path to allow imports from settings
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from settings.settings import DATABASE_SETTINGS
 
 def get_token_count_for_text(text, model="gpt-3.5-turbo"):
     """
@@ -59,14 +65,14 @@ def get_column_token_count(initial_db, input_value):
             aggregated_token_combined += token_combined
             columns_output.append({
                 "name": col_name,
-                "column_token_count_with_columns_name": token_name,
-                "column_token_count_with_columns_name_description_dt": token_combined
+                "token_count_with_columns_name": token_name,
+                "token_count_with_columns_name_description_dt": token_combined
             })
         
         return {
             "table_name": table.get("name", ""),
-            "table_token_count_with_columns_name": aggregated_token_name,
-            "table_token_count_with_columns_name_description_dt": aggregated_token_combined,
+            "token_count_with_columns_name": aggregated_token_name,
+            "token_count_with_columns_name_description_dt": aggregated_token_combined,
             "column_count": len(columns),
             "columns": columns_output
         }
@@ -86,31 +92,24 @@ def get_column_token_count(initial_db, input_value):
                     if table.get("name") == table_name:
                         processed_results.append(process_table(table, selected_columns))
     
-    with open("/home/ahmedraza/genBI/Text2SQL/database/get_column_token_count.json", "w") as outfile:
+    # Use the path from DATABASE_SETTINGS for output
+    output_path = DATABASE_SETTINGS["output_paths"]["column_token_count"]
+    with open(output_path, "w") as outfile:
         json.dump(processed_results, outfile, indent=2)
     
     return processed_results
 
 # Example usage:
 if __name__ == "__main__":
-    # Load initial_db from a JSON file.
-    # Ensure that "initial_db.json" exists in the same directory with proper structure.
-    with open("/home/ahmedraza/genBI/Text2SQL/database/db_metadata.json", "r") as infile:
+    # Load initial_db from a JSON file using the centralized path
+    input_path = DATABASE_SETTINGS["input_db_path"]
+    with open(input_path, "r") as infile:
         initial_db = json.load(infile)
     
     # Define the input value for processing. You can modify this as required.
-    get_token_count_input = [
-        {
-            "table": "request",
-            "column": ["id", "name"]
-        },
-        {
-            "table": "flotouser", 
-            "column": ["id", "name"]
-        }
-    ]
+    get_token_count_input = []
     
     # Call get_column_token_count using the loaded initial_db and the input definition.
     output = get_column_token_count(initial_db, get_token_count_input)
     
-    # The output is stored in "output.json" and also returned in the variable 'output'.
+    print(f"Column-level token counts stored in {DATABASE_SETTINGS['output_paths']['column_token_count']}")
