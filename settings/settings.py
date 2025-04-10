@@ -28,7 +28,11 @@ from base.chat_models import (
     chat_gemini_flash,
     chat_gemini_flash_lite
 )
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> Sid
 # Import embedding model functions instead of instances
 from base.embed_models import (
     get_openai_embed_ada,
@@ -77,10 +81,17 @@ DEFAULT_LLM = chat_gemini_flash
  
 # Default query generation LLM model (used specifically for generating SQL queries)
 DEFAULT_QUERY_LLM = chat_gemini_flash
+<<<<<<< HEAD
  
 # Default embedding model function (used for vectorizing text)
 DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base
  
+=======
+
+# Default embedding model function (used for vectorizing text)
+DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base
+
+>>>>>>> Sid
 # Default prompt for SQL generation
 DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
  
@@ -133,7 +144,11 @@ LLM_MODEL_MAPPING = {
     LLMModel.GEMINI_FLASH: chat_gemini_flash,
     LLMModel.GEMINI_FLASH_LITE: chat_gemini_flash_lite,
 }
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> Sid
 # Mapping from model enum to embedding model functions
 EMBEDDING_MODEL_MAPPING = {
     EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
@@ -206,7 +221,11 @@ def get_embedding_model(model_name: Optional[str] = None):
     except (ValueError, KeyError):
         print(f"Warning: Embedding model '{model_name}' not found. Using default embedding model.")
         return DEFAULT_EMBEDDING_MODEL_FUNC()
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> Sid
 def get_prompt(prompt_type: str = "generation"):
     """
     Get a prompt template by type.
