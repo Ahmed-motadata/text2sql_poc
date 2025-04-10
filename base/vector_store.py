@@ -384,3 +384,22 @@ def get_relevant_schema_for_query(
         result['tables'].append(table_info)
     
     return result
+
+
+
+    """
+    
+    
+    from langchain_postgres import PGVector
+from embed_models import get_jina_embed_base
+ 
+connection = "postgresql+psycopg://langchain:langchain@localhost:5432/langchain"
+collection_name = "T2sql"
+ 
+vector_store = PGVector(
+    embeddings=get_jina_embed_base(),
+    collection_name=collection_name,
+    connection=connection,
+    use_jsonb=True,
+)
+    """
