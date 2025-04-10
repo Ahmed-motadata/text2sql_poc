@@ -1,6 +1,6 @@
 """
 Configuration settings for Text2SQL application.
-
+ 
 This module provides centralized settings for:
 - Default LLM model for general use
 - Query generation LLM model
@@ -8,15 +8,15 @@ This module provides centralized settings for:
 - Vector store configuration
 - Default prompts
 """
-
+ 
 import os
 import sys
 from enum import Enum
 from typing import Dict, Any, Optional
-
+ 
 # Add parent directory to path to allow imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+ 
 # Import models to make them available
 from base.chat_models import (
     chat_gpt4o,
@@ -28,16 +28,17 @@ from base.chat_models import (
     chat_gemini_flash,
     chat_gemini_flash_lite
 )
-
+ 
+# Import embedding model functions instead of instances
 from base.embed_models import (
-    openai_embed_ada,
-    openai_embed_3_small,
-    openai_embed_3_large,
-    jina_embed_base,
-    jina_embed_clip,
-    jina_embed_small
+    get_openai_embed_ada,
+    get_openai_embed_3_small,
+    get_openai_embed_3_large,
+    get_jina_embed_base,
+    get_jina_embed_clip,
+    get_jina_embed_small
 )
-
+ 
 # Import prompts
 from base.prompts import (
     SQL_GENERATION_PROMPT,
@@ -47,7 +48,7 @@ from base.prompts import (
     SQL_OPTIMIZATION_PROMPT,
     ALL_PROMPTS
 )
-
+ 
 # Define model enumerations for type checking and autocompletion
 class LLMModel(str, Enum):
     """Available LLM models"""
@@ -59,7 +60,7 @@ class LLMModel(str, Enum):
     GROQ_DEEPSEEK = "deepseek-r1-distill-llama-70b"
     GEMINI_FLASH = "gemini-2.0-flash-001"
     GEMINI_FLASH_LITE = "gemini-2.0-flash-lite-001"
-
+ 
 class EmbeddingModel(str, Enum):
     """Available embedding models"""
     OPENAI_ADA = "text-embedding-ada-002"
@@ -68,41 +69,41 @@ class EmbeddingModel(str, Enum):
     JINA_BASE = "jina-embeddings-v2-base-en"
     JINA_CLIP = "jina-clip-v2"
     JINA_SMALL = "jina-embeddings-v2-small-en"
-
+ 
 # =========== DEFAULT SETTINGS ===========
-
+ 
 # Default LLM model (used for general purposes)
 DEFAULT_LLM = chat_gemini_flash
-
+ 
 # Default query generation LLM model (used specifically for generating SQL queries)
 DEFAULT_QUERY_LLM = chat_gemini_flash
-
-# Default embedding model (used for vectorizing text)
-DEFAULT_EMBEDDING_MODEL = jina_embed_base
-
+ 
+# Default embedding model function (used for vectorizing text)
+DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base
+ 
 # Default prompt for SQL generation
 DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
-
+ 
 # =========== DATABASE SETTINGS ===========
-
+ 
 # Database file paths for token counting functionality
 DATABASE_SETTINGS = {
-    "input_db_path": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+    "input_db_path": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                  "database", "db_metadata.json"),
     "output_paths": {
-        "column_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+        "column_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                          "database", "get_column_token_count.json"),
-        "table_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+        "table_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                         "database", "get_table_token_count.json"),
-        "token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+        "token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                   "database", "get_token_count.json"),
-        "processed_db": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+        "processed_db": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                    "database", "processed_db.json")
     }
 }
-
+ 
 # =========== VECTOR STORE SETTINGS ===========
-
+ 
 # Default Qdrant vector store settings
 VECTOR_STORE_SETTINGS = {
     "host": os.getenv("QDRANT_HOST", "localhost"),
@@ -113,14 +114,14 @@ VECTOR_STORE_SETTINGS = {
     "prefer_grpc": os.getenv("QDRANT_PREFER_GRPC", "False").lower() == "true",
     "timeout": float(os.getenv("QDRANT_TIMEOUT", 10.0))
 }
-
+ 
 # Default collection settings for schema metadata
 DEFAULT_COLLECTION_NAME = "text2sql_schema"
 DEFAULT_VECTOR_SIZE = 768  # Default for jina-embeddings-v2-base-en
 DEFAULT_DISTANCE = "cosine"
-
+ 
 # =========== MODEL MAPPINGS ===========
-
+ 
 # Mapping from model enum to actual model instances
 LLM_MODEL_MAPPING = {
     LLMModel.GPT4O: chat_gpt4o,
@@ -132,18 +133,19 @@ LLM_MODEL_MAPPING = {
     LLMModel.GEMINI_FLASH: chat_gemini_flash,
     LLMModel.GEMINI_FLASH_LITE: chat_gemini_flash_lite,
 }
-
+ 
+# Mapping from model enum to embedding model functions
 EMBEDDING_MODEL_MAPPING = {
-    EmbeddingModel.OPENAI_ADA: openai_embed_ada,
-    EmbeddingModel.OPENAI_3_SMALL: openai_embed_3_small,
-    EmbeddingModel.OPENAI_3_LARGE: openai_embed_3_large,
-    EmbeddingModel.JINA_BASE: jina_embed_base,
-    EmbeddingModel.JINA_CLIP: jina_embed_clip,
-    EmbeddingModel.JINA_SMALL: jina_embed_small,
+    EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
+    EmbeddingModel.OPENAI_3_SMALL: get_openai_embed_3_small,
+    EmbeddingModel.OPENAI_3_LARGE: get_openai_embed_3_large,
+    EmbeddingModel.JINA_BASE: get_jina_embed_base,
+    EmbeddingModel.JINA_CLIP: get_jina_embed_clip,
+    EmbeddingModel.JINA_SMALL: get_jina_embed_small,
 }
-
+ 
 # =========== HELPER FUNCTIONS ===========
-
+ 
 def get_llm_model(model_name: Optional[str] = None):
     """
     Get the appropriate LLM model based on the model name.
@@ -163,7 +165,7 @@ def get_llm_model(model_name: Optional[str] = None):
     except (ValueError, KeyError):
         print(f"Warning: Model '{model_name}' not found. Using default model.")
         return DEFAULT_LLM
-
+ 
 def get_query_llm(model_name: Optional[str] = None):
     """
     Get the appropriate query generation LLM model.
@@ -183,7 +185,7 @@ def get_query_llm(model_name: Optional[str] = None):
     except (ValueError, KeyError):
         print(f"Warning: Model '{model_name}' not found. Using default query model.")
         return DEFAULT_QUERY_LLM
-
+ 
 def get_embedding_model(model_name: Optional[str] = None):
     """
     Get the appropriate embedding model.
@@ -195,15 +197,16 @@ def get_embedding_model(model_name: Optional[str] = None):
         The corresponding embedding model instance
     """
     if not model_name:
-        return DEFAULT_EMBEDDING_MODEL
+        return DEFAULT_EMBEDDING_MODEL_FUNC()
         
     try:
         model_enum = EmbeddingModel(model_name)
-        return EMBEDDING_MODEL_MAPPING[model_enum]
+        model_func = EMBEDDING_MODEL_MAPPING[model_enum]
+        return model_func()
     except (ValueError, KeyError):
         print(f"Warning: Embedding model '{model_name}' not found. Using default embedding model.")
-        return DEFAULT_EMBEDDING_MODEL
-
+        return DEFAULT_EMBEDDING_MODEL_FUNC()
+ 
 def get_prompt(prompt_type: str = "generation"):
     """
     Get a prompt template by type.
@@ -218,7 +221,7 @@ def get_prompt(prompt_type: str = "generation"):
         return ALL_PROMPTS[prompt_type]
     print(f"Warning: Prompt type '{prompt_type}' not found. Using default SQL generation prompt.")
     return DEFAULT_SQL_PROMPT
-
+ 
 def get_vector_store_config():
     """
     Get the vector store configuration parameters.
@@ -227,7 +230,7 @@ def get_vector_store_config():
         Dictionary with vector store connection settings
     """
     return VECTOR_STORE_SETTINGS
-
+ 
 def get_collection_config(collection_name=None):
     """
     Get collection configuration for vector store.
