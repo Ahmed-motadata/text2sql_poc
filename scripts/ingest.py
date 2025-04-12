@@ -3,6 +3,7 @@ import sys
 import os
 from langchain_core.documents import Document
 from langchain.indexes import SQLRecordManager, index # Import the index function
+import datetime  # Add this for timestamping runs
 # Use SQLRecordManager, assuming standard community integration
 # If you installed a specific postgres integration, the path might differ slightly
 # from langchain_community.indexes import SQLRecordManager
@@ -15,9 +16,25 @@ from base.vector_store import vector_store # Your existing vector_store instance
 # Import necessary settings for RecordManager
 from settings.settings import PGVECTOR_CONNECTION_STRING, PGVECTOR_COLLECTION_NAME
  
+# Function to clear the vector store completely
+def clear_vector_store():
+    """Completely clears the vector store of all documents."""
+    try:
+        # This depends on the specific vector store implementation
+        # For PGVector, we can use:
+        if hasattr(vector_store, "delete"):
+            # Delete all documents (without filter = delete all)
+            vector_store.delete(ids=None, filter=None)
+            print("Vector store has been completely cleared.")
+        else:
+            print("WARNING: Could not clear vector store automatically. You may need to manually reset the collection.")
+    except Exception as e:
+        print(f"Error clearing vector store: {e}")
+        print("You may need to manually delete and recreate your vector store collection.")
+ 
 # --- Keep your existing functions, but add 'source' to metadata ---
  
-def get_table_docs_from_json(json_path: str):
+def get_table_docs_from_json(json_path: str, run_id: str):
     """Loads table data from JSON and adds source metadata."""
     with open(json_path, "r") as f:
         data = json.load(f)
@@ -37,25 +54,30 @@ def get_table_docs_from_json(json_path: str):
         page_content = f"Table: {table_name}\n\n{description}"
  
         metadata = {}
+        metadata["table_name"] = table.get("name", "")
         for key in allowed_metadata_keys:
             if key in table:
                 metadata[key] = table[key]
             # Optional: Keep warning or remove if too verbose
             # else:
             #     print(f"[⚠️ Missing] '{key}' not found in table '{table_name}'")
- 
+
+        
         metadata["column_names"] = column_names
         metadata["type"] = "table"
-        # --- Add source metadata ---
-        metadata["source"] = json_path # Use the file path as the source identifier
+        # --- Add source metadata with run_id ---
+        metadata["source"] = f"{json_path}_{run_id}" # Use the file path plus run_id as the source identifier
  
         table_docs.append(Document(page_content=page_content.strip(), metadata=metadata))
  
     return table_docs
  
  
-def get_column_docs_from_json(json_path: str):
-    """Loads column data from JSON and adds source metadata."""
+def get_column_docs_from_json(json_path: str, run_id: str):
+    """
+    Loads column data from JSON and adds source metadata.
+    Modified to give higher importance to column names during vectorization.
+    """
     with open(json_path, "r") as f:
         data = json.load(f)
  
@@ -65,9 +87,14 @@ def get_column_docs_from_json(json_path: str):
         for col in table.get("columns", []):
             column_name = col.get("name", "")
             column_description = col.get("description", "")
-            page_content = f"Column: {column_name}\n\n{column_description}"
+            table_name = table.get("name", "")
+            
+            # Enhanced content format that emphasizes column name by repeating it in multiple formats
+            # This gives the column name more weight in the vector embedding
+            page_content = f"Column: {column_name}\nCOLUMN_NAME: {column_name}\nCOLUMN_ID: {column_name}\nTABLE: {table_name}\n\n{column_description}"
  
             metadata = {}
+            metadata["column_name"] = column_name
             for key in [
                 "data_type",
                 "column_token_count",
@@ -79,8 +106,7 @@ def get_column_docs_from_json(json_path: str):
  
             metadata["table_name"] = table.get("name", "")
             metadata["type"] = "column"
-            # --- Add source metadata ---
-            metadata["source"] = json_path # Use the file path as the source identifier
+            metadata["source"] = f"{json_path}_{run_id}" # Use the file path plus run_id as the source identifier
  
             column_docs.append(Document(page_content=page_content.strip(), metadata=metadata))
  
@@ -89,14 +115,23 @@ def get_column_docs_from_json(json_path: str):
  
 if __name__ == "__main__":
     try:
+        # Generate a unique run ID with timestamp
+        run_id = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        print(f"Starting ingestion with run ID: {run_id}")
+        
+        # Ask if user wants to clear the vector store first
+        clear_first = input("Do you want to clear the vector store before ingestion? (y/n): ").strip().lower()
+        if clear_first == 'y':
+            clear_vector_store()
+ 
         # Use absolute path for better reliability
         script_dir = os.path.dirname(os.path.abspath(__file__))
         project_dir = os.path.dirname(script_dir)
         json_path = os.path.join(project_dir, "database", "processed_db.json")
  
         print(f"Loading documents from: {json_path}")
-        table_docs = get_table_docs_from_json(json_path)
-        column_docs = get_column_docs_from_json(json_path)
+        table_docs = get_table_docs_from_json(json_path, run_id)
+        column_docs = get_column_docs_from_json(json_path, run_id)
  
         if not table_docs and not column_docs:
              print("No documents found in the JSON file. Exiting.")
@@ -158,3 +193,4 @@ if __name__ == "__main__":
         print("Please check that the processed_db.json file exists in the 'database' directory.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+ 

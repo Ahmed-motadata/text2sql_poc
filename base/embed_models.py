@@ -67,3 +67,23 @@ def get_jina_embed_small():
         model_name="jina-embeddings-v2-small-en"
     )
 
+def get_jina_embed_clip_v2():
+    """
+    Returns an instance of JinaEmbeddings using the CLIP V2 model.
+    Only created when this function is called.
+    """
+    return JinaEmbeddings(
+        jina_api_key=os.getenv("JINA_API_KEY"),
+        model_name="jina-clip-v2-alt"  # Using an alternative name to differentiate from the first CLIP model
+    )
+
+def get_jina_embed_v3():
+    """
+    Returns an instance of JinaEmbeddings using the V3 model.
+    Only created when this function is called.
+    """
+    return JinaEmbeddings(
+        jina_api_key=os.getenv("JINA_API_KEY"),
+        model_name="jina-embeddings-v3"
+    )
+

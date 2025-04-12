@@ -10,3 +10,4 @@ get_column_token_count.json
 __pycache__/
 get_token_count.json
 pgvector
+retriever copy.py

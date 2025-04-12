@@ -17,7 +17,7 @@ from dotenv import load_dotenv
  
 # Load environment variables
 load_dotenv()
-
+ 
 # Add parent directory to path to allow imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
  
@@ -40,7 +40,9 @@ from base.embed_models import (
     get_openai_embed_3_large,
     get_jina_embed_base,
     get_jina_embed_clip,
-    get_jina_embed_small
+    get_jina_embed_small,
+    get_jina_embed_clip_v2,
+    get_jina_embed_v3
 )
  
 # Import prompts
@@ -73,6 +75,8 @@ class EmbeddingModel(str, Enum):
     JINA_BASE = "jina-embeddings-v2-base-en"
     JINA_CLIP = "jina-clip-v2"
     JINA_SMALL = "jina-embeddings-v2-small-en"
+    JINA_CLIP_V2 = "jina-clip-v2-alt"
+    JINA_V3 = "jina-embeddings-v3"
  
 # =========== DEFAULT SETTINGS ===========
  
@@ -83,7 +87,7 @@ DEFAULT_LLM = chat_gemini_flash
 DEFAULT_QUERY_LLM = chat_gemini_flash
  
 # Default embedding model function (used for vectorizing text)
-DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base
+DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base  # Changed from get_jina_embed_v3 to match the 1024 vector dimensions in the database
  
 # Default prompt for SQL generation
 DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
@@ -107,7 +111,7 @@ DATABASE_SETTINGS = {
 }
  
 # =========== VECTOR STORE SETTINGS ===========
-
+ 
 # PostgreSQL vector store settings
 PGVECTOR_SETTINGS = {
     "user": os.getenv("PGVECTOR_USER", "langchain"),
@@ -116,10 +120,10 @@ PGVECTOR_SETTINGS = {
     "port": os.getenv("PGVECTOR_PORT", "5444"),
     "dbname": os.getenv("PGVECTOR_DB", "langchain"),
 }
-
+ 
 # Build connection string
 PGVECTOR_CONNECTION_STRING = f"postgresql+psycopg://{PGVECTOR_SETTINGS['user']}:{PGVECTOR_SETTINGS['password']}@{PGVECTOR_SETTINGS['host']}:{PGVECTOR_SETTINGS['port']}/{PGVECTOR_SETTINGS['dbname']}"
-
+ 
 # Default collection name for vector store
 PGVECTOR_COLLECTION_NAME = os.getenv("PGVECTOR_COLLECTION", "T2sql_v3")
  
@@ -151,6 +155,8 @@ EMBEDDING_MODEL_MAPPING = {
     EmbeddingModel.JINA_BASE: get_jina_embed_base,
     EmbeddingModel.JINA_CLIP: get_jina_embed_clip,
     EmbeddingModel.JINA_SMALL: get_jina_embed_small,
+    EmbeddingModel.JINA_CLIP_V2: get_jina_embed_clip_v2,
+    EmbeddingModel.JINA_V3: get_jina_embed_v3,
 }
  
 # =========== HELPER FUNCTIONS ===========
@@ -238,7 +244,7 @@ def get_vector_store_config():
     Returns:
         Dictionary with vector store connection settings
     """
-    return VECTOR_STORE_SETTINGS
+    return PGVECTOR_SETTINGS
  
 def get_collection_config(collection_name=None):
     """
