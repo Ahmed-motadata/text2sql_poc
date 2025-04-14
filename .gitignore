@@ -15,4 +15,4 @@ ret.py
 main.py
 llm.py
 generate_sql.py
-test
+test/
