@@ -107,7 +107,7 @@ PGVECTOR_SETTINGS = {
     "user": os.getenv("PGVECTOR_USER", "langchain"),
     "password": os.getenv("PGVECTOR_PASSWORD", "langchain"),
     "host": os.getenv("PGVECTOR_HOST", "localhost"),
-    "port": os.getenv("PGVECTOR_PORT", "5444"),
+    "port": os.getenv("PGVECTOR_PORT", "5432"),
     "dbname": os.getenv("PGVECTOR_DB", "langchain"),
 }
 
