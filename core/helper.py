@@ -34,8 +34,6 @@ def get_column_token_count(initial_db, input_value):
     
     The output for each table is formatted so that table-level details come first followed by the list of columns.
     
-    Finally, the function writes the output (a list of dictionaries) into a JSON file.
-    
     :param initial_db: The full database metadata (a list of database dictionaries).
     :param input_value: List defining specific table and column processing.
     :return: The output as a list of processed table token counts.
@@ -93,11 +91,6 @@ def get_column_token_count(initial_db, input_value):
                     if table.get("name") == table_name:
                         processed_results.append(process_table(table, selected_columns))
     
-    # Use the path from DATABASE_SETTINGS for output
-    output_path = DATABASE_SETTINGS["output_paths"]["column_token_count"]
-    with open(output_path, "w") as outfile:
-        json.dump(processed_results, outfile, indent=2)
-    
     return processed_results
 
 def get_table_token_count(initial_db, input_value):
@@ -107,30 +100,15 @@ def get_table_token_count(initial_db, input_value):
     Input parameters:
       - initial_db: The entire database metadata loaded from a JSON file.
       - input_value: A list of dicts where each dict has a "table" key indicating the table to process.
-                   Example:
-                   [
-                     {"table": "table1"},
-                     {"table": "table2"}
-                   ]
+                   If empty ([]), process all tables in the db.
     
     Processing:
-      - If input_value is empty ([]), process all tables in the db.
-      - Otherwise, process only the specified tables.
       - For each table, compute:
            token_count: token count for "table name + table description" 
-           column_count: number of columns in the table, as returned by get_column_token_count.
+           column_count: number of columns in the table
            token_columns_with_columns_name: table token_count plus the aggregated token count for column names.
            token_with_columns_name_and_description_and_dt: table token_count plus the aggregated token count for
                "column name + column description + column datatype" across all columns.
-    
-    The output for each table is a dictionary with keys:
-      - table_name
-      - column_count
-      - token_count
-      - token_columns_with_columns_name
-      - token_with_columns_name_and_description_and_dt
-    
-    The final output (a list of such dictionaries) is stored in a JSON file.
     
     :param initial_db: The full database metadata.
     :param input_value: A list of table specifications; if empty, process the entire db.
@@ -179,11 +157,6 @@ def get_table_token_count(initial_db, input_value):
                 if table.get("name") in table_names_to_process:
                     results.append(process_table(table))
 
-    # Write results into a JSON file using the path from DATABASE_SETTINGS
-    output_path = DATABASE_SETTINGS["output_paths"]["table_token_count"]
-    with open(output_path, "w") as outfile:
-        json.dump(results, outfile, indent=2)
-
     return results
 
 def get_token_count(initial_db):
@@ -191,20 +164,10 @@ def get_token_count(initial_db):
     Processes the entire database metadata (initial_db) and produces overall token usage.
     
     Processing includes:
-      - Calling get_table_token_count with an empty input list so that it processes all tables.
-      - Calling get_column_token_count similarly for column-level details.
-      - Computing:
-            * table_count: Number of tables in the db.
-            * column_count: Sum of columns across all tables.
-            * database_token_count: Token count of (db_name + db_description)
-            * tables_token_count: Sum of token counts for each table (table name + description)
-            * tables_token_count_with_columns_name: Sum of (table token count + aggregated token count for column names)
-            * tables_token_with_columns_name_and_description_and_dt: Sum of (table token count + aggregated token count for 
-              (column name + column description + column datatype))
-      - Processing each table to include detailed column information.
+      - Computing table and column level token counts
+      - Aggregating statistics for the entire database
     
-    The final output is a dictionary in the format described in the docstring and is stored in two JSON files:
-    token_count.json and processed_db.json.
+    The final output is a dictionary with database metadata and token statistics.
     
     :param initial_db: The full database metadata (list of database dictionaries).
     :return: The processed database dictionary.
@@ -213,13 +176,6 @@ def get_token_count(initial_db):
     db_meta = initial_db[0]
     db_name = db_meta.get("db_name", "")
     db_description = db_meta.get("db_description", "")
-    
-    # Get table-level data using our function (processing all tables).
-    table_level_data = get_table_token_count(initial_db, [])  # returns a list of table-level aggregates
-
-    # Also get column-level aggregates (if needed) from get_column_token_count.
-    # (Though our final output will recompute detailed column info.)
-    _ = get_column_token_count(initial_db, [])  # Not used directly below, but illustrates the call.
     
     # Initialize accumulators.
     table_count = 0
@@ -248,7 +204,7 @@ def get_token_count(initial_db):
             col_name = col.get("name", "")
             col_desc = col.get("description", "")
             col_type = col.get("data_type", "")
-            # Compute token counts for the column. (The logic here can be modified as needed.)
+            # Compute token counts for the column.
             # token_count: tokens for (column name + column description)
             token_count = get_token_count_for_text(f"{col_name} {col_desc}")
             # token_count_with_column_name: tokens for the column name alone.
@@ -302,19 +258,14 @@ def get_token_count(initial_db):
         "tables": processed_tables
     }
     
-    # Write the processed database structure to a JSON file using the path from DATABASE_SETTINGS
-    token_count_path = DATABASE_SETTINGS["output_paths"]["token_count"]
-    with open(token_count_path, "w") as outfile:
-        json.dump(processed_db, outfile, indent=2)
-    
-    # Also save to processed_db.json
+    # Only save to processed_db.json
     processed_db_path = DATABASE_SETTINGS["output_paths"]["processed_db"]
     with open(processed_db_path, "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
     return processed_db
 
-# Main functions to run each token counting process
+# Main function to run the token counting process
 def run_get_token_count(input_db_path=None):
     """Helper function to run the get_token_count process"""
     # Use the provided path or get it from settings
@@ -328,58 +279,13 @@ def run_get_token_count(input_db_path=None):
     print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_paths']['processed_db']}")
     return result
 
-def run_get_table_token_count(input_db_path=None, input_value=None):
-    """Helper function to run the get_table_token_count process"""
-    # Use the provided path or get it from settings
-    if input_db_path is None:
-        input_db_path = DATABASE_SETTINGS["input_db_path"]
-        
-    with open(input_db_path, "r") as infile:
-        initial_db = json.load(infile)
-    
-    # Default to empty list if not provided
-    if input_value is None:
-        input_value = []
-        
-    result = get_table_token_count(initial_db, input_value)
-    print(f"Table-level token count processed and stored in {DATABASE_SETTINGS['output_paths']['table_token_count']}")
-    return result
-
-def run_get_column_token_count(input_db_path=None, input_value=None):
-    """Helper function to run the get_column_token_count process"""
-    # Use the provided path or get it from settings
-    if input_db_path is None:
-        input_db_path = DATABASE_SETTINGS["input_db_path"]
-        
-    with open(input_db_path, "r") as infile:
-        initial_db = json.load(infile)
-    
-    # Default to empty list if not provided
-    if input_value is None:
-        input_value = []
-        
-    result = get_column_token_count(initial_db, input_value)
-    print(f"Column-level token counts stored in {DATABASE_SETTINGS['output_paths']['column_token_count']}")
-    return result
-
-# This allows each function to be run individually if the helper module is executed directly
+# This allows the function to be run if the helper module is executed directly
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process token counts for database metadata")
-    parser.add_argument("--function", choices=["token", "table", "column"], 
-                      help="Function to run: token (get_token_count), table (get_table_token_count), column (get_column_token_count)")
+    parser.add_argument("--input-path", help="Path to the input database metadata JSON file")
     
     args = parser.parse_args()
     
-    if args.function == "token":
-        run_get_token_count()
-    elif args.function == "table":
-        run_get_table_token_count()
-    elif args.function == "column":
-        run_get_column_token_count()
-    else:
-        # Run all three by default
-        print("Running all token counting functions...")
-        run_get_column_token_count()
-        run_get_table_token_count()
-        run_get_token_count()
-        print("All token counting operations completed successfully.")
+    input_path = args.input_path if args.input_path else None
+    run_get_token_count(input_path)
+    print("Token counting operation completed successfully.")

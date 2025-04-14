@@ -99,12 +99,6 @@ DATABASE_SETTINGS = {
     "input_db_path": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                  "database", "db_metadata.json"),
     "output_paths": {
-        "column_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                         "database", "get_column_token_count.json"),
-        "table_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                        "database", "get_table_token_count.json"),
-        "token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                  "database", "get_token_count.json"),
         "processed_db": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                    "database", "processed_db.json")
     }
