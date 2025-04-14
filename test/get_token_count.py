@@ -6,8 +6,8 @@ import os
 # Add the parent directory to the path to allow imports from settings
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from settings.settings import DATABASE_SETTINGS
-from get_table_token_count import get_table_token_count
-from get_column_token_count import get_column_token_count
+from text2sql_poc.text2sql_poc.test.get_table_token_count import get_table_token_count
+from text2sql_poc.text2sql_poc.test.get_column_token_count import get_column_token_count
 
 def get_token_count_for_text(text, model="gpt-3.5-turbo"):
     """

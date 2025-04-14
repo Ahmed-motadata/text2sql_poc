@@ -66,4 +66,3 @@ def get_jina_embed_small():
         jina_api_key=os.getenv("JINA_API_KEY"),
         model_name="jina-embeddings-v2-small-en"
     )
-

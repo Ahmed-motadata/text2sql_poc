@@ -10,3 +10,8 @@ get_column_token_count.json
 __pycache__/
 get_token_count.json
 pgvector
+retriever_Neel.py
+ret.py
+main.py
+llm.py
+generate_sql.py
