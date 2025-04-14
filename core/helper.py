@@ -94,7 +94,7 @@ def get_column_token_count(initial_db, input_value):
                         processed_results.append(process_table(table, selected_columns))
     
     # Use the path from DATABASE_SETTINGS for output
-    output_path = DATABASE_SETTINGS["output_paths"]["column_token_count"]
+    output_path = DATABASE_SETTINGS["output_path"]["column_token_count"]
     with open(output_path, "w") as outfile:
         json.dump(processed_results, outfile, indent=2)
     
@@ -180,7 +180,7 @@ def get_table_token_count(initial_db, input_value):
                     results.append(process_table(table))
 
     # Write results into a JSON file using the path from DATABASE_SETTINGS
-    output_path = DATABASE_SETTINGS["output_paths"]["table_token_count"]
+    output_path = DATABASE_SETTINGS["output_path"]["table_token_count"]
     with open(output_path, "w") as outfile:
         json.dump(results, outfile, indent=2)
 
@@ -303,12 +303,12 @@ def get_token_count(initial_db):
     }
     
     # Write the processed database structure to a JSON file using the path from DATABASE_SETTINGS
-    token_count_path = DATABASE_SETTINGS["output_paths"]["token_count"]
+    token_count_path = DATABASE_SETTINGS["output_path"]["token_count"]
     with open(token_count_path, "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
     # Also save to processed_db.json
-    processed_db_path = DATABASE_SETTINGS["output_paths"]["processed_db"]
+    processed_db_path = DATABASE_SETTINGS["output_path"]["processed_db"]
     with open(processed_db_path, "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
@@ -325,7 +325,7 @@ def run_get_token_count(input_db_path=None):
         initial_db = json.load(infile)
     
     result = get_token_count(initial_db)
-    print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_paths']['processed_db']}")
+    print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_path']['processed_db']}")
     return result
 
 def run_get_table_token_count(input_db_path=None, input_value=None):
@@ -342,7 +342,7 @@ def run_get_table_token_count(input_db_path=None, input_value=None):
         input_value = []
         
     result = get_table_token_count(initial_db, input_value)
-    print(f"Table-level token count processed and stored in {DATABASE_SETTINGS['output_paths']['table_token_count']}")
+    print(f"Table-level token count processed and stored in {DATABASE_SETTINGS['output_path']['table_token_count']}")
     return result
 
 def run_get_column_token_count(input_db_path=None, input_value=None):
@@ -359,7 +359,7 @@ def run_get_column_token_count(input_db_path=None, input_value=None):
         input_value = []
         
     result = get_column_token_count(initial_db, input_value)
-    print(f"Column-level token counts stored in {DATABASE_SETTINGS['output_paths']['column_token_count']}")
+    print(f"Column-level token counts stored in {DATABASE_SETTINGS['output_path']['column_token_count']}")
     return result
 
 # This allows each function to be run individually if the helper module is executed directly

@@ -1,18 +1,9 @@
+venv/
+env/
 .env
-temp.py
-process_db.py
-functions.ipynb
-process_db copy.py
-db_token_counter.py
-token_counter.ipynb
-get_table_token_count.json
-get_column_token_count.json
-__pycache__/
-get_token_count.json
-pgvector
-retriever_Neel.py
-ret.py
-main.py
-llm.py
-generate_sql.py
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local__pycache__/
 test/
+database/processed_db.json

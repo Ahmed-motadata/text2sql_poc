@@ -94,13 +94,7 @@ DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
 DATABASE_SETTINGS = {
     "input_db_path": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                  "database", "db_metadata.json"),
-    "output_paths": {
-        "column_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                         "database", "get_column_token_count.json"),
-        "table_token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                        "database", "get_table_token_count.json"),
-        "token_count": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                  "database", "get_token_count.json"),
+    "output_path": {
         "processed_db": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                    "database", "processed_db.json")
     }
@@ -126,7 +120,6 @@ PGVECTOR_COLLECTION_NAME = os.getenv("PGVECTOR_COLLECTION", "T2sql_v3")
  
 # Default collection settings for schema metadata
 DEFAULT_COLLECTION_NAME = "text2sql_schema"
-DEFAULT_VECTOR_SIZE = 768  # Default for jina-embeddings-v2-base-en
 DEFAULT_DISTANCE = "cosine"
  
 # =========== MODEL MAPPINGS ===========
@@ -231,14 +224,6 @@ def get_prompt(prompt_type: str = "generation"):
     print(f"Warning: Prompt type '{prompt_type}' not found. Using default SQL generation prompt.")
     return DEFAULT_SQL_PROMPT
  
-def get_vector_store_config():
-    """
-    Get the vector store configuration parameters.
-    
-    Returns:
-        Dictionary with vector store connection settings
-    """
-    return VECTOR_STORE_SETTINGS
  
 def get_collection_config(collection_name=None):
     """
@@ -252,6 +237,5 @@ def get_collection_config(collection_name=None):
     """
     return {
         "name": collection_name or DEFAULT_COLLECTION_NAME,
-        "vector_size": DEFAULT_VECTOR_SIZE,
         "distance": DEFAULT_DISTANCE
     }
