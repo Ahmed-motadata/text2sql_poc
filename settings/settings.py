@@ -23,14 +23,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
  
 # Import models to make them available
 from base.chat_models import (
-    chat_gpt4o,
-    chat_gpt4,
-    chat_gpt_o3mini,
-    chat_groq_llama,
-    chat_groq_llama_70b,
-    chat_groq_deepseek,
-    chat_gemini_flash,
-    chat_gemini_flash_lite
+#    get_chat_gpt4o,
+#    get_chat_gpt4,
+#    get_chat_gpt_o3mini,
+#    get_chat_groq_llama,
+#    get_chat_groq_llama_70b,
+#    get_chat_groq_deepseek,
+    get_chat_gemini_flash,
+    get_chat_gemini_flash_lite
 )
  
 # Import embedding model functions instead of instances
@@ -81,10 +81,10 @@ class EmbeddingModel(str, Enum):
 # =========== DEFAULT SETTINGS ===========
  
 # Default LLM model (used for general purposes)
-DEFAULT_LLM = chat_gemini_flash
+DEFAULT_LLM = get_chat_gemini_flash
  
 # Default query generation LLM model (used specifically for generating SQL queries)
-DEFAULT_QUERY_LLM = chat_gemini_flash
+DEFAULT_QUERY_LLM = get_chat_gemini_flash
  
 # Default embedding model function (used for vectorizing text)
 DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base  # Changed from get_jina_embed_v3 to match the 1024 vector dimensions in the database
@@ -137,21 +137,21 @@ DEFAULT_DISTANCE = "cosine"
  
 # Mapping from model enum to actual model instances
 LLM_MODEL_MAPPING = {
-    LLMModel.GPT4O: chat_gpt4o,
-    LLMModel.GPT4: chat_gpt4,
-    LLMModel.GPT_O3MINI: chat_gpt_o3mini,
-    LLMModel.GROQ_LLAMA: chat_groq_llama,
-    LLMModel.GROQ_LLAMA_70B: chat_groq_llama_70b,
-    LLMModel.GROQ_DEEPSEEK: chat_groq_deepseek,
-    LLMModel.GEMINI_FLASH: chat_gemini_flash,
-    LLMModel.GEMINI_FLASH_LITE: chat_gemini_flash_lite,
+#     LLMModel.GPT4O: get_chat_gpt4o,
+#     LLMModel.GPT4: get_chat_gpt4,
+#     LLMModel.GPT_O3MINI: get_chat_gpt_o3mini,
+    # LLMModel.GROQ_LLAMA: get_chat_groq_llama,
+    # LLMModel.GROQ_LLAMA_70B: get_chat_groq_llama_70b,
+    # LLMModel.GROQ_DEEPSEEK: get_chat_groq_deepseek,
+    LLMModel.GEMINI_FLASH: get_chat_gemini_flash,
+    LLMModel.GEMINI_FLASH_LITE: get_chat_gemini_flash_lite,
 }
  
 # Mapping from model enum to embedding model functions
 EMBEDDING_MODEL_MAPPING = {
-    EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
-    EmbeddingModel.OPENAI_3_SMALL: get_openai_embed_3_small,
-    EmbeddingModel.OPENAI_3_LARGE: get_openai_embed_3_large,
+    # EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
+    # EmbeddingModel.OPENAI_3_SMALL: get_openai_embed_3_small,
+    # EmbeddingModel.OPENAI_3_LARGE: get_openai_embed_3_large,
     EmbeddingModel.JINA_BASE: get_jina_embed_base,
     EmbeddingModel.JINA_CLIP: get_jina_embed_clip,
     EmbeddingModel.JINA_SMALL: get_jina_embed_small,

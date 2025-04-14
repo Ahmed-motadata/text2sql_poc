@@ -9,12 +9,6 @@ _SQL_GENERATION_TEMPLATE = """"
     You are a database expert helping to translate natural language queries to SQL for a ticketing system in the 'apolo' schema.
     This is a PostgreSQL database containing tables for request management, users, departments, priorities, etc.
 
-    ## Database Schema
-    {db_metadata}
-
-    ## User Query
-    "{user_query}"
-
     ## Strict Rules
     1. ONLY use tables and columns that are explicitly defined in the schema
     2. ALWAYS include the schema name 'apolo' before each table name (e.g., apolo.request)
