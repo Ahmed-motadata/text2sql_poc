@@ -27,12 +27,7 @@ _SQL_GENERATION_TEMPLATE = """"
     - table_name2: column1, column2
     (List only the tables and columns that are used in your SQL query)
  
-    ### SQL Query
-    ```sql
-    Your PostgreSQL query here
-    ```
- 
-    Remember to use only table names and column names that exist in the provided schema.
+
     """
  
  

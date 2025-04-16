@@ -93,27 +93,27 @@ class Retriever:
         return final_result
  
  
-# if __name__ == "__main__":
-#     k = 5
-#     threshold = 0.7
-#     user_query = "Show me 5 requests with high priority"
+if __name__ == "__main__":
+    k = 5
+    threshold = 0.7
+    user_query = "Show me 5 requests with high priority"
  
-#     retriever = Retriever(k, threshold, user_query)
+    retriever = Retriever(k, threshold, user_query)
  
-#     # Retrieve table documents
-#     table_docs = retriever.get_table_doc()
-#     table_names = list({doc.metadata["table_name"] for doc, _ in table_docs})
-#     print("\nRetrieved Table Documents:")
-#     for doc in table_docs:
-#        print(doc)
+    # Retrieve table documents
+    table_docs = retriever.get_table_doc()
+    table_names = list({doc.metadata["table_name"] for doc, _ in table_docs})
+    print("\nRetrieved Table Documents:")
+    for doc in table_docs:
+       print(doc)
         
  
-#     # Retrieve column documents
-#     column_docs = retriever.get_column_doc(table_names)
+    # Retrieve column documents
+    column_docs = retriever.get_column_doc(table_names)
     
  
-#     print("\nRetrieved Column Documents:")
-#     for doc, score in column_docs:
-#         print(f"[{doc.metadata['table_name']}.{doc.metadata['column_name']}] - Score: {score:.3f}")
-#         print(doc)
+    print("\nRetrieved Column Documents:")
+    for doc, score in column_docs:
+        print(f"[{doc.metadata['table_name']}.{doc.metadata['column_name']}] - Score: {score:.3f}")
+        print(doc)
  
