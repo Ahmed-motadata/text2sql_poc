@@ -1,6 +1,5 @@
 .env
 temp.py
-process_db.py
 functions.ipynb
 process_db copy.py
 db_token_counter.py

@@ -4,7 +4,6 @@ import sys
 import os
 import argparse
 
-# Add the parent directory to the path to allow imports from settings
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from settings.settings import DATABASE_SETTINGS
 
@@ -259,7 +258,7 @@ def get_token_count(initial_db):
     }
     
     # Only save to processed_db.json
-    processed_db_path = DATABASE_SETTINGS["output_paths"]["processed_db"]
+    processed_db_path = DATABASE_SETTINGS["output_path"]["processed_db"]
     with open(processed_db_path, "w") as outfile:
         json.dump(processed_db, outfile, indent=2)
     
@@ -276,7 +275,7 @@ def run_get_token_count(input_db_path=None):
         initial_db = json.load(infile)
     
     result = get_token_count(initial_db)
-    print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_paths']['processed_db']}")
+    print(f"Processed DB token counts stored in {DATABASE_SETTINGS['output_path']['processed_db']}")
     return result
 
 # This allows the function to be run if the helper module is executed directly

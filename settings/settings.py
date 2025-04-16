@@ -1,257 +1,79 @@
-"""
-Configuration settings for Text2SQL application.
- 
-This module provides centralized settings for:
-- Default LLM model for general use
-- Query generation LLM model
-- Embedding models for vectorization
-- Vector store configuration
-- Default prompts
-"""
- 
 import os
 import sys
 from enum import Enum
-from typing import Dict, Any, Optional
+from typing import Optional
 from dotenv import load_dotenv
- 
-# Load environment variables
 load_dotenv()
- 
-# Add parent directory to path to allow imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from base.chat_models import *
+from base.embed_models import *
+from base.prompts import * 
+
+DEFAULT_LLM = OPENAI_4O_MINI
+DEFAULT_QUERY_LLM = OPENAI_4O_MINI
+    
+DEFAULT_TABLE_FETCHING_LLM = OPENAI_4O_MINI
+DEFAULT_COLUMN_FETCHING_LLM = OPENAI_4O_MINI
+DEFAULT_EMBEDDING_MODEL = JINA_EMBED_V3
  
-# Import models to make them available
-from base.chat_models import (
-#    get_chat_gpt4o,
-#    get_chat_gpt4,
-#    get_chat_gpt_o3mini,
-#    get_chat_groq_llama,
-#    get_chat_groq_llama_70b,
-#    get_chat_groq_deepseek,
-    get_chat_gemini_flash,
-    get_chat_gemini_flash_lite
-)
- 
-# Import embedding model functions instead of instances
-from base.embed_models import (
-    get_openai_embed_ada,
-    get_openai_embed_3_small,
-    get_openai_embed_3_large,
-    get_jina_embed_base,
-    get_jina_embed_clip,
-    get_jina_embed_small,
-    get_jina_embed_clip_v2,
-    get_jina_embed_v3
-)
- 
-# Import prompts
-from base.prompts import (
-    SQL_GENERATION_PROMPT,
-    SQL_GENERATION_WITH_EXAMPLES_PROMPT,
-    SQL_EXPLANATION_PROMPT,
-    SQL_DEBUGGING_PROMPT,
-    SQL_OPTIMIZATION_PROMPT,
-    ALL_PROMPTS
-)
- 
-# Define model enumerations for type checking and autocompletion
-class LLMModel(str, Enum):
-    """Available LLM models"""
-    GPT4O = "gpt-4o"
-    GPT4 = "gpt-4"
-    GPT_O3MINI = "gpt-o3-mini"
-    GROQ_LLAMA = "llama-3.3-70b-versatile"
-    GROQ_LLAMA_70B = "llama3-70b-8192"
-    GROQ_DEEPSEEK = "deepseek-r1-distill-llama-70b"
-    GEMINI_FLASH = "gemini-2.0-flash-001"
-    GEMINI_FLASH_LITE = "gemini-2.0-flash-lite-001"
- 
-class EmbeddingModel(str, Enum):
-    """Available embedding models"""
-    OPENAI_ADA = "text-embedding-ada-002"
-    OPENAI_3_SMALL = "text-embedding-3-small"
-    OPENAI_3_LARGE = "text-embedding-3-large"
-    JINA_BASE = "jina-embeddings-v2-base-en"
-    JINA_CLIP = "jina-clip-v2"
-    JINA_SMALL = "jina-embeddings-v2-small-en"
-    JINA_CLIP_V2 = "jina-clip-v2-alt"
-    JINA_V3 = "jina-embeddings-v3"
- 
-# =========== DEFAULT SETTINGS ===========
- 
-# Default LLM model (used for general purposes)
-DEFAULT_LLM = get_chat_gemini_flash
- 
-# Default query generation LLM model (used specifically for generating SQL queries)
-DEFAULT_QUERY_LLM = get_chat_gemini_flash
- 
-# Default embedding model function (used for vectorizing text)
-DEFAULT_EMBEDDING_MODEL_FUNC = get_jina_embed_base  # Changed from get_jina_embed_v3 to match the 1024 vector dimensions in the database
- 
-# Default prompt for SQL generation
 DEFAULT_SQL_PROMPT = SQL_GENERATION_PROMPT
  
-# =========== DATABASE SETTINGS ===========
+DEFAULT_SIMILAR_TABLES_PROMPT = SIMILAR_TABLES_RETRIEVAL_PROMPT
  
-# Database file paths for token counting functionality
+DEFAULT_SIMILAR_COLUMNS_PROMPT = SIMILAR_COLUMNS_RETRIEVAL_PROMPT
+ 
+DEFAULT_CONTEXT_SQL_PROMPT = CONTEXT_SQL_PROMPT
+ 
+# =========== DATABASE SETTINGS ===========
 DATABASE_SETTINGS = {
     "input_db_path": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                  "database", "db_metadata.json"),
-    "output_paths": {
+    "output_path": {
         "processed_db": os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                    "database", "processed_db.json")
     }
 }
  
-# =========== VECTOR STORE SETTINGS ===========
- 
-# PostgreSQL vector store settings
-PGVECTOR_SETTINGS = {
-    "user": os.getenv("PGVECTOR_USER", "langchain"),
-    "password": os.getenv("PGVECTOR_PASSWORD", "langchain"),
-    "host": os.getenv("PGVECTOR_HOST", "localhost"),
-    "port": os.getenv("PGVECTOR_PORT", "5444"),
-    "dbname": os.getenv("PGVECTOR_DB", "langchain"),
-}
- 
-# Build connection string
-PGVECTOR_CONNECTION_STRING = f"postgresql+psycopg://{PGVECTOR_SETTINGS['user']}:{PGVECTOR_SETTINGS['password']}@{PGVECTOR_SETTINGS['host']}:{PGVECTOR_SETTINGS['port']}/{PGVECTOR_SETTINGS['dbname']}"
+PGVECTOR_CONNECTION_STRING = (
+    f"postgresql+psycopg://{os.getenv('PGVECTOR_USER')}:{os.getenv('PGVECTOR_PASSWORD')}"
+    f"@{os.getenv('PGVECTOR_HOST')}:{os.getenv('PGVECTOR_PORT')}/{os.getenv('PGVECTOR_DB')}"
+)
  
 # Default collection name for vector store
 PGVECTOR_COLLECTION_NAME = os.getenv("PGVECTOR_COLLECTION", "T2sql_v3")
- 
- 
-# Default collection settings for schema metadata
 DEFAULT_COLLECTION_NAME = "text2sql_schema"
-DEFAULT_VECTOR_SIZE = 768  # Default for jina-embeddings-v2-base-en
-DEFAULT_DISTANCE = "cosine"
+DEFAULT_VECTOR_SIZE = os.getenv("DEFAULT_VECTOR_SIZE")
+DEFAULT_DISTANCE = os.getenv("DEFAULT_DISTANCE")
  
-# =========== MODEL MAPPINGS ===========
  
-# Mapping from model enum to actual model instances
-LLM_MODEL_MAPPING = {
-#     LLMModel.GPT4O: get_chat_gpt4o,
-#     LLMModel.GPT4: get_chat_gpt4,
-#     LLMModel.GPT_O3MINI: get_chat_gpt_o3mini,
-    # LLMModel.GROQ_LLAMA: get_chat_groq_llama,
-    # LLMModel.GROQ_LLAMA_70B: get_chat_groq_llama_70b,
-    # LLMModel.GROQ_DEEPSEEK: get_chat_groq_deepseek,
-    LLMModel.GEMINI_FLASH: get_chat_gemini_flash,
-    LLMModel.GEMINI_FLASH_LITE: get_chat_gemini_flash_lite,
-}
- 
-# Mapping from model enum to embedding model functions
-EMBEDDING_MODEL_MAPPING = {
-    # EmbeddingModel.OPENAI_ADA: get_openai_embed_ada,
-    # EmbeddingModel.OPENAI_3_SMALL: get_openai_embed_3_small,
-    # EmbeddingModel.OPENAI_3_LARGE: get_openai_embed_3_large,
-    EmbeddingModel.JINA_BASE: get_jina_embed_base,
-    EmbeddingModel.JINA_CLIP: get_jina_embed_clip,
-    EmbeddingModel.JINA_SMALL: get_jina_embed_small,
-    EmbeddingModel.JINA_CLIP_V2: get_jina_embed_clip_v2,
-    EmbeddingModel.JINA_V3: get_jina_embed_v3,
-}
- 
-# =========== HELPER FUNCTIONS ===========
- 
-def get_llm_model(model_name: Optional[str] = None):
+def get_similar_tables_prompt(custom_template: Optional[str] = None):
     """
-    Get the appropriate LLM model based on the model name.
-    
+    Get the similar tables retrieval prompt.
     Args:
-        model_name: The name of the model to retrieve (must match an LLMModel enum value)
-        
+        custom_template: Optional custom template to use instead of default
     Returns:
-        The corresponding LLM model instance
+        The corresponding prompt template for similar tables retrieval
     """
-    if not model_name:
-        return DEFAULT_LLM
-        
-    try:
-        model_enum = LLMModel(model_name)
-        return LLM_MODEL_MAPPING[model_enum]
-    except (ValueError, KeyError):
-        print(f"Warning: Model '{model_name}' not found. Using default model.")
-        return DEFAULT_LLM
+    if custom_template:
+        from langchain.prompts import PromptTemplate
+        return PromptTemplate(
+            input_variables=["all_tables_info", "user_query"],
+            template=custom_template
+        )
+    return DEFAULT_SIMILAR_TABLES_PROMPT
  
-def get_query_llm(model_name: Optional[str] = None):
+def get_similar_columns_prompt(custom_template: Optional[str] = None):
     """
-    Get the appropriate query generation LLM model.
-    
+    Get the similar columns retrieval prompt.
     Args:
-        model_name: The name of the model to retrieve (must match an LLMModel enum value)
-        
+        custom_template: Optional custom template to use instead of default
     Returns:
-        The corresponding LLM model instance for query generation
+        The corresponding prompt template for similar columns retrieval
     """
-    if not model_name:
-        return DEFAULT_QUERY_LLM
-        
-    try:
-        model_enum = LLMModel(model_name)
-        return LLM_MODEL_MAPPING[model_enum]
-    except (ValueError, KeyError):
-        print(f"Warning: Model '{model_name}' not found. Using default query model.")
-        return DEFAULT_QUERY_LLM
- 
-def get_embedding_model(model_name: Optional[str] = None):
-    """
-    Get the appropriate embedding model.
-    
-    Args:
-        model_name: The name of the model to retrieve (must match an EmbeddingModel enum value)
-        
-    Returns:
-        The corresponding embedding model instance
-    """
-    if not model_name:
-        return DEFAULT_EMBEDDING_MODEL_FUNC()
-        
-    try:
-        model_enum = EmbeddingModel(model_name)
-        model_func = EMBEDDING_MODEL_MAPPING[model_enum]
-        return model_func()
-    except (ValueError, KeyError):
-        print(f"Warning: Embedding model '{model_name}' not found. Using default embedding model.")
-        return DEFAULT_EMBEDDING_MODEL_FUNC()
- 
-def get_prompt(prompt_type: str = "generation"):
-    """
-    Get a prompt template by type.
-    
-    Args:
-        prompt_type: Type of prompt to retrieve (matches keys in ALL_PROMPTS)
-        
-    Returns:
-        The corresponding prompt template or default prompt if not found
-    """
-    if prompt_type in ALL_PROMPTS:
-        return ALL_PROMPTS[prompt_type]
-    print(f"Warning: Prompt type '{prompt_type}' not found. Using default SQL generation prompt.")
-    return DEFAULT_SQL_PROMPT
- 
-def get_vector_store_config():
-    """
-    Get the vector store configuration parameters.
-    
-    Returns:
-        Dictionary with vector store connection settings
-    """
-    return PGVECTOR_SETTINGS
- 
-def get_collection_config(collection_name=None):
-    """
-    Get collection configuration for vector store.
-    
-    Args:
-        collection_name: Optional name of collection to use (defaults to DEFAULT_COLLECTION_NAME)
-        
-    Returns:
-        Dictionary with collection configuration parameters
-    """
-    return {
-        "name": collection_name or DEFAULT_COLLECTION_NAME,
-        "vector_size": DEFAULT_VECTOR_SIZE,
-        "distance": DEFAULT_DISTANCE
-    }
+    if custom_template:
+        from langchain.prompts import PromptTemplate
+        return PromptTemplate(
+            input_variables=["all_columns_info", "user_query"],
+            template=custom_template
+        )
+    return DEFAULT_SIMILAR_COLUMNS_PROMPT

@@ -1,80 +1,31 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
-from functools import lru_cache
-
+from langchain.chat_models import init_chat_model
+ 
 load_dotenv()
+ 
+# Initialize OpenAI models
+OPENAI_4 = init_chat_model('gpt-4', model_provider="openai",api_key=os.getenv("OPENAI_API_KEY") )
+OPENAI_4O_MINI = init_chat_model("gpt-4o-mini", model_provider="openai", api_key=os.getenv("OPENAI_API_KEY"))
+OPENAI_03_MINI = init_chat_model("gpt-o3-mini",model_provider="openai",api_key=os.getenv('OPENAI_API_KEY'))
 
-# @lru_cache
-# def get_chat_gpt4o():
-#     """
-#     Lazy initialization for the GPT-4o model.
-#     """
-#     return ChatOpenAI(
-#         model="gpt-4o",
-#         temperature=0,
-#         openai_api_key=os.getenv("OPENAI_API_KEY")
-#     )
+# # Initialize GROQ models conditionally - handle Pydantic version conflicts
+# try:
+#     GROQ_LLAMA_3_3_70b = init_chat_model("llama-3.3-70b-versatile", model_provider="groq", api_key=os.getenv("GROQ_API_KEY"))
+#     GROQ_LLAMA_3_70b = init_chat_model("llama3-70b-8192", model_provider="groq", api_key=os.getenv('GROQ_API_KEY'))
+#     GROQ_DEEPSEEK_R1 = init_chat_model("deepseek-r1-distill-llama-70b", model_provider="groq", api_key=os.getenv('GROQ_API_KEY'))
+# except Exception as e:
+#     print(f"Warning: GROQ models initialization failed. Using None instead. Error: {e}")
+#     # Provide fallback None values to prevent import errors
+#     GROQ_LLAMA_3_3_70b = None 
+#     GROQ_LLAMA_3_70b = None
+#     GROQ_DEEPSEEK_R1 = None
 
-# @lru_cache
-# def get_chat_gpt4():
-#     """
-#     Lazy initialization for the GPT-4 model.
-#     """
-#     return ChatOpenAI(
-#         model="gpt-4",
-#         temperature=0,
-#         openai_api_key=os.getenv("OPENAI_API_KEY")
-#     )
-
-# chat_gpt_o3mini = ChatOpenAI(
-#     model="gpt-o3-mini",
-#     temperature=0,
-#     openai_api_key=os.getenv("OPENAI_API_KEY")
-# )
-
-chat_groq_llama = ChatGroq(
-    model="llama-3.3-70b-versatile",  
-    temperature=0,
-    groq_api_key=os.getenv("GROQ_API_KEY")
-)
-
-chat_groq_llama_70b = ChatGroq(
-    model="llama3-70b-8192",  
-    temperature=0,
-    groq_api_key=os.getenv("GROQ_API_KEY"))
-
-chat_groq_deepseek = ChatGroq(
-    model="deepseek-r1-distill-llama-70b",  
-    temperature=0,
-    groq_api_key=os.getenv("GROQ_API_KEY"))
-
-@lru_cache
-def get_chat_gemini_flash():
-    """
-    Lazy initialization for the Gemini 2.0 Flash model.
-    """
-    return ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-001",
-        temperature=0,
-        google_api_key=os.getenv("GOOGLE_API_KEY")
-    )
-
-@lru_cache
-def get_chat_gemini_flash_lite():
-    """
-    Lazy initialization for the Gemini 2.0 Flash Lite model.
-    """
-    return ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-lite-001",
-        temperature=0,
-        google_api_key=os.getenv("GOOGLE_API_KEY")
-    )
-
-chat_gemini_flash = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-001",  
-    temperature=0,
-    google_api_key=os.getenv("GOOGLE_API_KEY")
-)
+# # Initialize Google models conditionally
+# try:
+#     GEMINI_FLASH = init_chat_model("gemini-2.0-flash-001",model_provider="google_genai", api_key=os.getenv('GOOGLE_API_KEY'))
+#     GEMINI_FLASH_LITE = init_chat_model("gemini-2.0-flash-lite-001",model_provider="google_genai", api_key=os.getenv('GOOGLE_API_KEY'))
+# except Exception as e:
+#     print(f"Warning: Gemini models initialization failed. Using None instead. Error: {e}")
+#     GEMINI_FLASH = None
+#     GEMINI_FLASH_LITE = None
