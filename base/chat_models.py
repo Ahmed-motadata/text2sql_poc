@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
-from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI
  
 load_dotenv()
  
 # Initialize OpenAI models
-OPENAI_4 = init_chat_model('gpt-4', model_provider="openai",api_key=os.getenv("OPENAI_API_KEY") )
-OPENAI_4O_MINI = init_chat_model("gpt-4o-mini", model_provider="openai", api_key=os.getenv("OPENAI_API_KEY"))
-OPENAI_03_MINI = init_chat_model("gpt-o3-mini",model_provider="openai",api_key=os.getenv('OPENAI_API_KEY'))
+OPENAI_4 = ChatOpenAI(model_name="gpt-4", openai_api_key=os.getenv("OPENAI_API_KEY"))
+OPENAI_4O_MINI = ChatOpenAI(model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY"))
+OPENAI_03_MINI = ChatOpenAI(model_name="gpt-o3-mini", openai_api_key=os.getenv('OPENAI_API_KEY'))
 
 # # Initialize GROQ models conditionally - handle Pydantic version conflicts
 # try:
